@@ -36,8 +36,9 @@ const TeamFlag = ({ teamName }: { teamName: string }) => {
         className="w-5 h-5 object-contain"
         onError={(e) => {
           const target = e.target as HTMLImageElement;
-          target.src = 'https://via.placeholder.com/32x32/cccccc/666666?text=?';
+          target.src = 'https://via.placeholder.com/20x20/e5e7eb/6b7280?text=' + encodeURIComponent(teamName.charAt(0).toUpperCase());
         }}
+        loading="lazy"
       />
     </div>
   );
