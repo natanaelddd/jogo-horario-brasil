@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { RefreshCw, Database, Clock, CheckCircle, XCircle, AlertCircle, LogOut, Image } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GameDataService } from '@/services/gameDataService';
 import { AuthService } from '@/services/authService';
-import { FetchLog } from '@/types/game';
+import { FetchLog, DataSource } from '@/types/game';
 import { CAMPEONATOS } from '@/config/campeonatos';
 import { useToast } from '@/hooks/use-toast';
 import AdminLogin from './AdminLogin';
@@ -19,8 +20,27 @@ interface AdminPanelProps {
 
 const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(AuthService.getInstance().isLoggedIn());
-  const [logs, setLogs] = useState<FetchLog[]>(GameDataService.getInstance().getFetchLogs());
+  const [logs, setLogs] = useState<FetchLog[]>([]);
+  const [dataSources, setDataSources] = useState<DataSource[]>([]);
   const { toast } = useToast();
+
+  // Load logs and data sources on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const fetchedLogs = await GameDataService.getInstance().getFetchLogs();
+        const fetchedSources = await GameDataService.getInstance().getDataSources();
+        setLogs(fetchedLogs);
+        setDataSources(fetchedSources);
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+      }
+    };
+
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -47,7 +67,10 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
       });
       
       await onDataUpdate();
-      setLogs(GameDataService.getInstance().getFetchLogs());
+      
+      // Reload logs after update
+      const updatedLogs = await GameDataService.getInstance().getFetchLogs();
+      setLogs(updatedLogs);
       
       toast({
         title: "Atualização concluída",
@@ -209,7 +232,7 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {GameDataService.getInstance().getDataSources().map((source, index) => (
+                {dataSources.map((source, index) => (
                   <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex-1">
                       <p className="font-medium">{source.name}</p>

@@ -129,7 +129,7 @@ const Index = () => {
           </div>
         </div>
 
-        <BannerDisplay />
+        <BannerDisplay type="top" />
 
         {/* Filtros por Campeonato */}
         <Card className="mb-6">
