@@ -1,327 +1,230 @@
+
 import { useState, useEffect } from 'react';
-import { Search, Calendar, Trophy, Settings, Globe, Flag } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RefreshCw, Settings, Trophy, Globe, Flag, Crown, Award, Star, Zap } from 'lucide-react';
+import { GameDataService } from '@/services/gameDataService';
+import { Game, CampeonatoType } from '@/types/game';
+import { CAMPEONATOS } from '@/config/campeonatos';
 import GameCard from '@/components/GameCard';
 import AdminPanel from '@/components/AdminPanel';
 import BannerDisplay from '@/components/BannerDisplay';
-import { GameDataService } from '@/services/gameDataService';
-import { BannerService } from '@/services/bannerService';
-import { Game, CampeonatoType } from '@/types/game';
-import { CAMPEONATOS, getCampeonatosByCategoria } from '@/config/campeonatos';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
-  const [games, setGames] = useState<Game[]>([]);
-  const [filteredGames, setFilteredGames] = useState<Game[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCampeonato, setSelectedCampeonato] = useState<string>('all');
-  const [selectedDate, setSelectedDate] = useState<string>('all');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasTopBanners, setHasTopBanners] = useState(false);
-  const [hasSidebarBanners, setHasSidebarBanners] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [selectedCampeonato, setSelectedCampeonato] = useState<CampeonatoType | 'todos'>('todos');
   const { toast } = useToast();
 
-  const gameService = GameDataService.getInstance();
-  const bannerService = BannerService.getInstance();
+  const { data: games = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['games', selectedCampeonato],
+    queryFn: async () => {
+      const gameService = GameDataService.getInstance();
+      if (selectedCampeonato === 'todos') {
+        return await gameService.fetchAllGames();
+      } else {
+        return await gameService.fetchGamesByCampeonato(selectedCampeonato);
+      }
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+  });
 
   useEffect(() => {
-    loadGames();
-    checkActiveBanners();
-    
-    // Verificar banners a cada 30 segundos
-    const bannerInterval = setInterval(checkActiveBanners, 30000);
-    return () => clearInterval(bannerInterval);
-  }, []);
-
-  useEffect(() => {
-    filterGames();
-  }, [games, searchTerm, selectedCampeonato, selectedDate, selectedCategory]);
-
-  const checkActiveBanners = () => {
-    const topBanners = bannerService.getBannersByType('top');
-    const sidebarBanners = bannerService.getBannersByType('sidebar');
-    
-    setHasTopBanners(topBanners.length > 0);
-    setHasSidebarBanners(sidebarBanners.length > 0);
-  };
-
-  const loadGames = async () => {
-    setIsLoading(true);
-    try {
-      const { games: fetchedGames } = await gameService.fetchWithFallback();
-      setGames(fetchedGames);
+    if (error) {
       toast({
-        title: "Dados carregados",
-        description: `${fetchedGames.length} jogos encontrados`
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao carregar dados",
-        description: "Usando dados em cache",
+        title: "Erro ao carregar jogos",
+        description: "Não foi possível carregar os dados dos jogos. Tente novamente.",
         variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
+    }
+  }, [error, toast]);
+
+  const handleManualRefresh = async () => {
+    try {
+      await refetch();
+      toast({
+        title: "Dados atualizados",
+        description: "Os jogos foram atualizados com sucesso!"
+      });
+    } catch {
+      toast({
+        title: "Erro na atualização",
+        description: "Falha ao atualizar os dados",
+        variant: "destructive"
+      });
     }
   };
 
-  const filterGames = () => {
-    let filtered = [...games];
-
-    if (searchTerm) {
-      filtered = filtered.filter(game => 
-        game.time_casa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        game.time_fora.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        game.estadio.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        CAMPEONATOS[game.campeonato].nome.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (selectedCampeonato !== 'all') {
-      filtered = filtered.filter(game => game.campeonato === selectedCampeonato);
-    }
-
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(game => CAMPEONATOS[game.campeonato].categoria === selectedCategory);
-    }
-
-    if (selectedDate !== 'all') {
-      filtered = filtered.filter(game => game.data === selectedDate);
-    }
-
-    setFilteredGames(filtered);
+  const getIconComponent = (iconName: string) => {
+    const icons = { Trophy, Globe, Flag, Crown, Award, Star, Zap };
+    return icons[iconName as keyof typeof icons] || Trophy;
   };
 
-  const getUniqueDate = () => {
-    const dates = Array.from(new Set(games.map(game => game.data))).sort();
-    return dates;
-  };
+  const filteredGames = selectedCampeonato === 'todos' 
+    ? games 
+    : games.filter(game => game.campeonato === selectedCampeonato);
 
-  const getGamesByCategory = (categoria: 'nacional' | 'internacional' | 'selecao') => {
-    return filteredGames.filter(game => CAMPEONATOS[game.campeonato].categoria === categoria);
-  };
+  const activeCampeonatos = Object.entries(CAMPEONATOS).filter(([_, camp]) => camp.ativo);
 
-  const formatDateDisplay = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('pt-BR', { 
-      weekday: 'long', 
-      day: '2-digit', 
-      month: 'long' 
-    });
-  };
-
-  const campeonatosNacionais = getCampeonatosByCategoria('nacional');
-  const campeonatosInternacionais = getCampeonatosByCategoria('internacional');
-  const campeonatosSelecao = getCampeonatosByCategoria('selecao');
+  if (showAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 p-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold gradient-brasil bg-clip-text text-transparent">
+              Painel Administrativo
+            </h1>
+            <Button variant="outline" onClick={() => setShowAdmin(false)}>
+              Voltar ao Site
+            </Button>
+          </div>
+          <AdminPanel onDataUpdate={handleManualRefresh} isLoading={isLoading} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
-      {/* Header */}
-      <header className="gradient-brasil text-white shadow-lg">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Trophy className="w-8 h-8" />
-              <div>
-                <h1 className="text-3xl font-bold">Horário do Jogo</h1>
-                <p className="text-white/90 text-sm">
-                  Todos os campeonatos do futebol brasileiro
-                </p>
-              </div>
-            </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Admin
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Painel de Administração</DialogTitle>
-                </DialogHeader>
-                <AdminPanel onDataUpdate={loadGames} isLoading={isLoading} />
-              </DialogContent>
-            </Dialog>
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2 gradient-brasil bg-clip-text text-transparent">
+            Horário do Jogo
+          </h1>
+          <p className="text-lg text-muted-foreground mb-4">
+            Acompanhe todos os jogos dos principais campeonatos
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
+            <Button 
+              onClick={handleManualRefresh}
+              disabled={isLoading}
+              className="gradient-brasil text-white font-semibold"
+            >
+              {isLoading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Atualizando...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Atualizar Dados
+                </>
+              )}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAdmin(true)}
+              className="border-green-600 text-green-600 hover:bg-green-50"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Admin
+            </Button>
           </div>
         </div>
-      </header>
 
-      {/* Banner do Topo - só renderiza se houver banners ativos */}
-      {hasTopBanners && (
-        <BannerDisplay type="top" className="container mx-auto px-4 pt-4" />
-      )}
+        <BannerDisplay />
 
-      <main className="container mx-auto px-4 py-8">
-        <div className={`flex gap-8 ${hasSidebarBanners ? '' : 'justify-center'}`}>
-          {/* Conteúdo Principal */}
-          <div className={`${hasSidebarBanners ? 'flex-1' : 'w-full max-w-none'}`}>
-            {/* Filtros */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar por time, estádio ou campeonato..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas as categorias</SelectItem>
-                    <SelectItem value="nacional">Nacional</SelectItem>
-                    <SelectItem value="internacional">Internacional</SelectItem>
-                    <SelectItem value="selecao">Seleção</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={selectedCampeonato} onValueChange={setSelectedCampeonato}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Campeonato" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os campeonatos</SelectItem>
-                    {Object.values(CAMPEONATOS).filter(c => c.ativo).map(campeonato => (
-                      <SelectItem key={campeonato.id} value={campeonato.id}>
-                        {campeonato.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={selectedDate} onValueChange={setSelectedDate}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Data" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas as datas</SelectItem>
-                    {getUniqueDate().map(date => (
-                      <SelectItem key={date} value={date}>
-                        {formatDateDisplay(date)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Abas por categoria */}
-            <Tabs defaultValue="all" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-8">
-                <TabsTrigger value="all" className="flex items-center gap-2">
+        {/* Filtros por Campeonato */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-center">Selecione o Campeonato</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={selectedCampeonato} onValueChange={(value) => setSelectedCampeonato(value as CampeonatoType | 'todos')}>
+              <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 h-auto p-2">
+                <TabsTrigger value="todos" className="flex items-center gap-2 p-3">
                   <Trophy className="w-4 h-4" />
-                  Todos ({filteredGames.length})
+                  Todos
                 </TabsTrigger>
-                <TabsTrigger value="nacional" className="flex items-center gap-2">
-                  <Flag className="w-4 h-4" />
-                  Nacional ({getGamesByCategory('nacional').length})
-                </TabsTrigger>
-                <TabsTrigger value="internacional" className="flex items-center gap-2">
-                  <Globe className="w-4 h-4" />
-                  Internacional ({getGamesByCategory('internacional').length})
-                </TabsTrigger>
-                <TabsTrigger value="selecao" className="flex items-center gap-2">
-                  <Flag className="w-4 h-4" />
-                  Seleção ({getGamesByCategory('selecao').length})
-                </TabsTrigger>
+                {activeCampeonatos.map(([id, campeonato]) => {
+                  const IconComponent = getIconComponent(campeonato.icone);
+                  return (
+                    <TabsTrigger 
+                      key={id} 
+                      value={id}
+                      className="flex items-center gap-2 p-3 text-xs"
+                    >
+                      <IconComponent className="w-4 h-4" />
+                      <span className="hidden sm:inline">{campeonato.nome}</span>
+                      <span className="sm:hidden">{campeonato.nome.split(' ')[0]}</span>
+                    </TabsTrigger>
+                  );
+                })}
               </TabsList>
-
-              <TabsContent value="all">
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Carregando jogos...</p>
-                  </div>
-                ) : filteredGames.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Nenhum jogo encontrado com os filtros selecionados</p>
-                  </div>
-                ) : (
-                  <div className={`grid gap-6 ${
-                    hasSidebarBanners 
-                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
-                  }`}>
-                    {filteredGames.map(game => (
-                      <GameCard key={game.id} game={game} />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-
-              {(['nacional', 'internacional', 'selecao'] as const).map(categoria => (
-                <TabsContent key={categoria} value={categoria}>
-                  <div className={`grid gap-6 ${
-                    hasSidebarBanners 
-                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
-                  }`}>
-                    {getGamesByCategory(categoria).map(game => (
-                      <GameCard key={game.id} game={game} />
-                    ))}
-                  </div>
-                </TabsContent>
-              ))}
             </Tabs>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Banner Lateral - só renderiza se houver banners ativos */}
-          {hasSidebarBanners && (
-            <div className="w-80 hidden lg:block">
-              <BannerDisplay type="sidebar" />
+        {/* Lista de Jogos */}
+        <div className="space-y-4">
+          {isLoading ? (
+            <div className="text-center py-8">
+              <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+              <p className="text-lg">Carregando jogos...</p>
+            </div>
+          ) : filteredGames.length === 0 ? (
+            <Card className="text-center py-8">
+              <CardContent>
+                <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">Nenhum jogo encontrado</h3>
+                <p className="text-muted-foreground">
+                  {selectedCampeonato === 'todos' 
+                    ? 'Não há jogos agendados no momento.' 
+                    : `Não há jogos agendados para ${CAMPEONATOS[selectedCampeonato as CampeonatoType]?.nome}.`
+                  }
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredGames.map((game) => (
+                <GameCard key={game.id} game={game} />
+              ))}
             </div>
           )}
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-8 mt-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="font-bold text-lg mb-4">Campeonatos Nacionais</h3>
-              <ul className="space-y-2 text-sm text-slate-400">
-                {campeonatosNacionais.map(camp => (
-                  <li key={camp.id}>{camp.nome}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4">Campeonatos Internacionais</h3>
-              <ul className="space-y-2 text-sm text-slate-400">
-                {campeonatosInternacionais.map(camp => (
-                  <li key={camp.id}>{camp.nome}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4">Seleção Brasileira</h3>
-              <ul className="space-y-2 text-sm text-slate-400">
-                {campeonatosSelecao.map(camp => (
-                  <li key={camp.id}>{camp.nome}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-700 mt-8 pt-4 text-center">
-            <p className="text-slate-400">
-              © 2025 Horário do Jogo - Dados atualizados automaticamente via múltiplas fontes
-            </p>
-          </div>
-        </div>
-      </footer>
+        {/* Estatísticas */}
+        {filteredGames.length > 0 && (
+          <Card className="mt-8">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold gradient-brasil bg-clip-text text-transparent">
+                    {filteredGames.length}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Total de Jogos</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-green-600">
+                    {filteredGames.filter(g => g.status === 'agendado').length}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Agendados</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-red-600">
+                    {filteredGames.filter(g => g.status === 'ao_vivo').length}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Ao Vivo</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-600">
+                    {filteredGames.filter(g => g.status === 'finalizado').length}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Finalizados</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

@@ -9,7 +9,129 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      data_sources: {
+        Row: {
+          active: boolean | null
+          campeonatos: string[] | null
+          created_at: string
+          id: string
+          name: string
+          priority: number | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          active?: boolean | null
+          campeonatos?: string[] | null
+          created_at?: string
+          id?: string
+          name: string
+          priority?: number | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          active?: boolean | null
+          campeonatos?: string[] | null
+          created_at?: string
+          id?: string
+          name?: string
+          priority?: number | null
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      fetch_logs: {
+        Row: {
+          campeonato: string
+          created_at: string
+          games_found: number | null
+          id: string
+          message: string | null
+          source: string
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          campeonato: string
+          created_at?: string
+          games_found?: number | null
+          id?: string
+          message?: string | null
+          source: string
+          status: string
+          timestamp?: string
+        }
+        Update: {
+          campeonato?: string
+          created_at?: string
+          games_found?: number | null
+          id?: string
+          message?: string | null
+          source?: string
+          status?: string
+          timestamp?: string
+        }
+        Relationships: []
+      }
+      games: {
+        Row: {
+          campeonato: string
+          created_at: string
+          data: string
+          estadio: string
+          fase: string | null
+          hora: string
+          id: string
+          placar_casa: number | null
+          placar_fora: number | null
+          rodada: number | null
+          serie: string | null
+          status: string | null
+          time_casa: string
+          time_fora: string
+          transmissao: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          campeonato: string
+          created_at?: string
+          data: string
+          estadio: string
+          fase?: string | null
+          hora: string
+          id?: string
+          placar_casa?: number | null
+          placar_fora?: number | null
+          rodada?: number | null
+          serie?: string | null
+          status?: string | null
+          time_casa: string
+          time_fora: string
+          transmissao?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          campeonato?: string
+          created_at?: string
+          data?: string
+          estadio?: string
+          fase?: string | null
+          hora?: string
+          id?: string
+          placar_casa?: number | null
+          placar_fora?: number | null
+          rodada?: number | null
+          serie?: string | null
+          status?: string | null
+          time_casa?: string
+          time_fora?: string
+          transmissao?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
