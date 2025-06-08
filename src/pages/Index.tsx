@@ -11,6 +11,7 @@ import { CAMPEONATOS } from '@/config/campeonatos';
 import GameCard from '@/components/GameCard';
 import AdminPanel from '@/components/AdminPanel';
 import BannerDisplay from '@/components/BannerDisplay';
+import Logo from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -90,11 +91,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header com Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-2 gradient-brasil bg-clip-text text-transparent">
-            Horário do Jogo
-          </h1>
+          <div className="flex justify-center mb-6">
+            <Logo />
+          </div>
           <p className="text-lg text-muted-foreground mb-4">
             Acompanhe todos os jogos dos principais campeonatos
           </p>
