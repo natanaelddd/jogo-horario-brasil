@@ -1,20 +1,17 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RefreshCw, Settings, Trophy, Globe, Flag, Crown, Award, Star, Zap, Table } from 'lucide-react';
 import { GameDataService } from '@/services/gameDataService';
-import { Game, CampeonatoType } from '@/types/game';
-import { CAMPEONATOS } from '@/config/campeonatos';
-import GameCard from '@/components/GameCard';
-import AdminPanel from '@/components/AdminPanel';
-import BannerDisplay from '@/components/BannerDisplay';
-import Logo from '@/components/Logo';
-import CampeonatoDetails from '@/components/CampeonatoDetails';
-import StandingsTable from '@/components/StandingsTable';
+import { CampeonatoType } from '@/types/game';
 import { useToast } from '@/hooks/use-toast';
+import AdminPanel from '@/components/AdminPanel';
+import AppHeader from '@/components/AppHeader';
+import ViewSelector from '@/components/ViewSelector';
+import CampeonatoFilter from '@/components/CampeonatoFilter';
+import GamesView from '@/components/GamesView';
+import StandingsView from '@/components/StandingsView';
+import CampeonatosView from '@/components/CampeonatosView';
+import StatsCard from '@/components/StatsCard';
 
 const Index = () => {
   const [showAdmin, setShowAdmin] = useState(false);
@@ -62,16 +59,9 @@ const Index = () => {
     }
   };
 
-  const getIconComponent = (iconName: string) => {
-    const icons = { Trophy, Globe, Flag, Crown, Award, Star, Zap };
-    return icons[iconName as keyof typeof icons] || Trophy;
-  };
-
   const filteredGames = selectedCampeonato === 'todos' 
     ? games 
     : games.filter(game => game.campeonato === selectedCampeonato);
-
-  const activeCampeonatos = Object.entries(CAMPEONATOS).filter(([_, camp]) => camp.ativo);
 
   if (showAdmin) {
     return (
@@ -81,9 +71,12 @@ const Index = () => {
             <h1 className="text-3xl font-bold gradient-brasil bg-clip-text text-transparent">
               Painel Administrativo
             </h1>
-            <Button variant="outline" onClick={() => setShowAdmin(false)}>
+            <button
+              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              onClick={() => setShowAdmin(false)}
+            >
               Voltar ao Site
-            </Button>
+            </button>
           </div>
           <AdminPanel onDataUpdate={handleManualRefresh} isLoading={isLoading} />
         </div>
@@ -94,211 +87,44 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header com Logo */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-6">
-            <Logo />
-          </div>
-          <p className="text-lg text-muted-foreground mb-4">
-            Acompanhe todos os jogos dos principais campeonatos
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
-            <Button 
-              onClick={handleManualRefresh}
-              disabled={isLoading}
-              className="gradient-brasil text-white font-semibold"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Atualizando...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Atualizar Dados
-                </>
-              )}
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={() => setShowAdmin(true)}
-              className="border-green-600 text-green-600 hover:bg-green-50"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Admin
-            </Button>
-          </div>
-        </div>
+        <AppHeader 
+          onRefresh={handleManualRefresh}
+          onShowAdmin={() => setShowAdmin(true)}
+          isLoading={isLoading}
+        />
 
-        <BannerDisplay type="top" />
+        <ViewSelector 
+          activeView={activeView}
+          onViewChange={setActiveView}
+        />
 
-        {/* Menu de Visualização */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <Tabs value={activeView} onValueChange={(value) => setActiveView(value as any)}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="jogos">
-                  <Trophy className="w-4 h-4 mr-2" />
-                  Jogos
-                </TabsTrigger>
-                <TabsTrigger value="classificacao">
-                  <Table className="w-4 h-4 mr-2" />
-                  Classificações
-                </TabsTrigger>
-                <TabsTrigger value="campeonato">
-                  <Globe className="w-4 h-4 mr-2" />
-                  Campeonatos
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Filtros por Campeonato */}
         {activeView !== 'campeonato' && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-center">Selecione o Campeonato</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs value={selectedCampeonato} onValueChange={(value) => setSelectedCampeonato(value as CampeonatoType | 'todos')}>
-                <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 h-auto p-2">
-                  <TabsTrigger value="todos" className="flex items-center gap-2 p-3">
-                    <Trophy className="w-4 h-4" />
-                    Todos
-                  </TabsTrigger>
-                  {activeCampeonatos.map(([id, campeonato]) => {
-                    const IconComponent = getIconComponent(campeonato.icone);
-                    return (
-                      <TabsTrigger 
-                        key={id} 
-                        value={id}
-                        className="flex items-center gap-2 p-3 text-xs"
-                      >
-                        <IconComponent className="w-4 h-4" />
-                        <span className="hidden sm:inline">{campeonato.nome}</span>
-                        <span className="sm:hidden">{campeonato.nome.split(' ')[0]}</span>
-                      </TabsTrigger>
-                    );
-                  })}
-                </TabsList>
-              </Tabs>
-            </CardContent>
-          </Card>
+          <CampeonatoFilter 
+            selectedCampeonato={selectedCampeonato}
+            onCampeonatoChange={setSelectedCampeonato}
+          />
         )}
 
-        {/* Conteúdo Principal */}
         {activeView === 'jogos' && (
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="text-center py-8">
-                <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-                <p className="text-lg">Carregando jogos...</p>
-              </div>
-            ) : filteredGames.length === 0 ? (
-              <Card className="text-center py-8">
-                <CardContent>
-                  <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">Nenhum jogo encontrado</h3>
-                  <p className="text-muted-foreground">
-                    {selectedCampeonato === 'todos' 
-                      ? 'Não há jogos agendados no momento.' 
-                      : `Não há jogos agendados para ${CAMPEONATOS[selectedCampeonato as CampeonatoType]?.nome}.`
-                    }
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredGames.map((game) => (
-                  <GameCard key={game.id} game={game} />
-                ))}
-              </div>
-            )}
-          </div>
+          <>
+            <GamesView 
+              games={games}
+              isLoading={isLoading}
+              selectedCampeonato={selectedCampeonato}
+            />
+            <StatsCard games={filteredGames} />
+          </>
         )}
 
         {activeView === 'classificacao' && (
-          <div className="space-y-6">
-            {selectedCampeonato === 'todos' ? (
-              <div className="grid gap-6 lg:grid-cols-2">
-                {activeCampeonatos
-                  .filter(([id]) => ['brasileiro-a', 'brasileiro-b'].includes(id))
-                  .map(([id, campeonato]) => (
-                    <StandingsTable key={id} campeonato={id as CampeonatoType} />
-                  ))}
-              </div>
-            ) : (
-              <StandingsTable campeonato={selectedCampeonato as CampeonatoType} />
-            )}
-          </div>
+          <StandingsView selectedCampeonato={selectedCampeonato} />
         )}
 
         {activeView === 'campeonato' && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {activeCampeonatos.map(([id, campeonato]) => (
-              <Card key={id} className="cursor-pointer hover:shadow-lg transition-shadow" 
-                    onClick={() => {
-                      setSelectedCampeonato(id as CampeonatoType);
-                      setActiveView('jogos');
-                    }}>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-12 h-12 ${campeonato.cor} rounded-full flex items-center justify-center`}>
-                      {(() => {
-                        const IconComponent = getIconComponent(campeonato.icone);
-                        return <IconComponent className="w-6 h-6 text-white" />;
-                      })()}
-                    </div>
-                    <div>
-                      <h3 className="font-bold">{campeonato.nome}</h3>
-                      <p className="text-sm text-muted-foreground capitalize">{campeonato.categoria}</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="w-full">
-                    Ver Detalhes
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Estatísticas */}
-        {activeView === 'jogos' && filteredGames.length > 0 && (
-          <Card className="mt-8">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold gradient-brasil bg-clip-text text-transparent">
-                    {filteredGames.length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Total de Jogos</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-green-600">
-                    {filteredGames.filter(g => g.status === 'agendado').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Agendados</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-red-600">
-                    {filteredGames.filter(g => g.status === 'ao_vivo').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Ao Vivo</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-600">
-                    {filteredGames.filter(g => g.status === 'finalizado').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Finalizados</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <CampeonatosView 
+            onCampeonatoSelect={setSelectedCampeonato}
+            onViewChange={setActiveView}
+          />
         )}
       </div>
     </div>
