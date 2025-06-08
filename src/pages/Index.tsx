@@ -9,6 +9,7 @@ import GameCard from '@/components/GameCard';
 import AdminPanel from '@/components/AdminPanel';
 import BannerDisplay from '@/components/BannerDisplay';
 import { GameDataService } from '@/services/gameDataService';
+import { BannerService } from '@/services/bannerService';
 import { Game, CampeonatoType } from '@/types/game';
 import { CAMPEONATOS, getCampeonatosByCategoria } from '@/config/campeonatos';
 import { useToast } from '@/hooks/use-toast';
@@ -21,17 +22,33 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasTopBanners, setHasTopBanners] = useState(false);
+  const [hasSidebarBanners, setHasSidebarBanners] = useState(false);
   const { toast } = useToast();
 
   const gameService = GameDataService.getInstance();
+  const bannerService = BannerService.getInstance();
 
   useEffect(() => {
     loadGames();
+    checkActiveBanners();
+    
+    // Verificar banners a cada 30 segundos
+    const bannerInterval = setInterval(checkActiveBanners, 30000);
+    return () => clearInterval(bannerInterval);
   }, []);
 
   useEffect(() => {
     filterGames();
   }, [games, searchTerm, selectedCampeonato, selectedDate, selectedCategory]);
+
+  const checkActiveBanners = () => {
+    const topBanners = bannerService.getBannersByType('top');
+    const sidebarBanners = bannerService.getBannersByType('sidebar');
+    
+    setHasTopBanners(topBanners.length > 0);
+    setHasSidebarBanners(sidebarBanners.length > 0);
+  };
 
   const loadGames = async () => {
     setIsLoading(true);
@@ -56,7 +73,6 @@ const Index = () => {
   const filterGames = () => {
     let filtered = [...games];
 
-    // Filtro por termo de busca
     if (searchTerm) {
       filtered = filtered.filter(game => 
         game.time_casa.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,17 +82,14 @@ const Index = () => {
       );
     }
 
-    // Filtro por campeonato
     if (selectedCampeonato !== 'all') {
       filtered = filtered.filter(game => game.campeonato === selectedCampeonato);
     }
 
-    // Filtro por categoria
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(game => CAMPEONATOS[game.campeonato].categoria === selectedCategory);
     }
 
-    // Filtro por data
     if (selectedDate !== 'all') {
       filtered = filtered.filter(game => game.data === selectedDate);
     }
@@ -139,13 +152,15 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Banner do Topo */}
-      <BannerDisplay type="top" className="container mx-auto px-4 pt-4" />
+      {/* Banner do Topo - só renderiza se houver banners ativos */}
+      {hasTopBanners && (
+        <BannerDisplay type="top" className="container mx-auto px-4 pt-4" />
+      )}
 
       <main className="container mx-auto px-4 py-8">
-        <div className="flex gap-8">
+        <div className={`flex gap-8 ${hasSidebarBanners ? '' : 'justify-center'}`}>
           {/* Conteúdo Principal */}
-          <div className="flex-1">
+          <div className={`${hasSidebarBanners ? 'flex-1' : 'w-full max-w-none'}`}>
             {/* Filtros */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -234,7 +249,11 @@ const Index = () => {
                     <p className="text-muted-foreground">Nenhum jogo encontrado com os filtros selecionados</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className={`grid gap-6 ${
+                    hasSidebarBanners 
+                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+                  }`}>
                     {filteredGames.map(game => (
                       <GameCard key={game.id} game={game} />
                     ))}
@@ -244,7 +263,11 @@ const Index = () => {
 
               {(['nacional', 'internacional', 'selecao'] as const).map(categoria => (
                 <TabsContent key={categoria} value={categoria}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className={`grid gap-6 ${
+                    hasSidebarBanners 
+                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+                  }`}>
                     {getGamesByCategory(categoria).map(game => (
                       <GameCard key={game.id} game={game} />
                     ))}
@@ -254,10 +277,12 @@ const Index = () => {
             </Tabs>
           </div>
 
-          {/* Banner Lateral */}
-          <div className="w-80 hidden lg:block">
-            <BannerDisplay type="sidebar" />
-          </div>
+          {/* Banner Lateral - só renderiza se houver banners ativos */}
+          {hasSidebarBanners && (
+            <div className="w-80 hidden lg:block">
+              <BannerDisplay type="sidebar" />
+            </div>
+          )}
         </div>
       </main>
 
