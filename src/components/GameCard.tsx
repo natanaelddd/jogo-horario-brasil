@@ -1,9 +1,9 @@
-
 import { Calendar, Clock, MapPin, Tv, Trophy, Globe, Flag, Crown, Award, Star, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Game } from '@/types/game';
 import { CAMPEONATOS } from '@/config/campeonatos';
+import { TeamService } from '@/services/teamService';
 
 interface GameCardProps {
   game: Game;
@@ -21,6 +21,23 @@ const getIconComponent = (iconName: string) => {
     MapPin
   };
   return icons[iconName as keyof typeof icons] || Trophy;
+};
+
+const TeamFlag = ({ teamName }: { teamName: string }) => {
+  const teamService = TeamService.getInstance();
+  const teamInfo = teamService.getTeamInfo(teamName);
+
+  return (
+    <img 
+      src={teamInfo?.flag} 
+      alt={`Escudo ${teamName}`}
+      className="w-5 h-5 object-contain flex-shrink-0"
+      onError={(e) => {
+        const target = e.target as HTMLImageElement;
+        target.style.display = 'none';
+      }}
+    />
+  );
 };
 
 const GameCard = ({ game }: GameCardProps) => {
@@ -65,7 +82,10 @@ const GameCard = ({ game }: GameCardProps) => {
         <div className="text-center">
           <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
             <div className="text-right flex-1">
-              <p className="font-bold text-lg">{game.time_casa}</p>
+              <div className="flex items-center justify-end gap-2 mb-1">
+                <p className="font-bold text-lg">{game.time_casa}</p>
+                <TeamFlag teamName={game.time_casa} />
+              </div>
               <p className="text-sm text-muted-foreground">Casa</p>
               {game.placar_casa !== undefined && (
                 <p className="text-2xl font-bold text-primary">{game.placar_casa}</p>
@@ -85,7 +105,10 @@ const GameCard = ({ game }: GameCardProps) => {
             </div>
             
             <div className="text-left flex-1">
-              <p className="font-bold text-lg">{game.time_fora}</p>
+              <div className="flex items-center justify-start gap-2 mb-1">
+                <TeamFlag teamName={game.time_fora} />
+                <p className="font-bold text-lg">{game.time_fora}</p>
+              </div>
               <p className="text-sm text-muted-foreground">Visitante</p>
               {game.placar_fora !== undefined && (
                 <p className="text-2xl font-bold text-primary">{game.placar_fora}</p>

@@ -1,14 +1,16 @@
-
 import { useState } from 'react';
-import { RefreshCw, Database, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { RefreshCw, Database, Clock, CheckCircle, XCircle, AlertCircle, LogOut, Image } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GameDataService } from '@/services/gameDataService';
+import { AuthService } from '@/services/authService';
 import { FetchLog } from '@/types/game';
 import { CAMPEONATOS } from '@/config/campeonatos';
 import { useToast } from '@/hooks/use-toast';
+import AdminLogin from './AdminLogin';
+import BannerManager from './BannerManager';
 
 interface AdminPanelProps {
   onDataUpdate: () => void;
@@ -16,8 +18,26 @@ interface AdminPanelProps {
 }
 
 const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(AuthService.getInstance().isLoggedIn());
   const [logs, setLogs] = useState<FetchLog[]>(GameDataService.getInstance().getFetchLogs());
   const { toast } = useToast();
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    AuthService.getInstance().logout();
+    setIsAuthenticated(false);
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso."
+    });
+  };
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />;
+  }
 
   const handleManualUpdate = async () => {
     try {
@@ -91,10 +111,16 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="w-5 h-5" />
-            Painel de Administração - Todos os Campeonatos
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Database className="w-5 h-5" />
+              Painel de Administração - Todos os Campeonatos
+            </CardTitle>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Button 
@@ -117,12 +143,20 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="logs" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="banners" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="banners">
+            <Image className="w-4 h-4 mr-2" />
+            Banners
+          </TabsTrigger>
           <TabsTrigger value="logs">Logs de Atualização</TabsTrigger>
           <TabsTrigger value="sources">Fontes de Dados</TabsTrigger>
           <TabsTrigger value="status">Status dos Campeonatos</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="banners">
+          <BannerManager />
+        </TabsContent>
         
         <TabsContent value="logs" className="space-y-4">
           <Card>
