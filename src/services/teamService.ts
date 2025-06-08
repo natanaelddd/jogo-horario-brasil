@@ -11,103 +11,125 @@ export class TeamService {
     // Times da Série A
     'flamengo': { 
       name: 'Flamengo', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/flamengo-vector-logo.png',
+      flag: 'https://logodetimes.com/times/flamengo/logo-flamengo-256.png',
       colors: ['#ff0000', '#000000']
     },
     'palmeiras': { 
       name: 'Palmeiras', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/palmeiras-vector-logo.png',
+      flag: 'https://logodetimes.com/times/palmeiras/logo-palmeiras-256.png',
       colors: ['#00ff00', '#ffffff']
     },
     'corinthians': { 
       name: 'Corinthians', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/corinthians-vector-logo.png',
+      flag: 'https://logodetimes.com/times/corinthians/logo-corinthians-256.png',
       colors: ['#000000', '#ffffff']
     },
     'são paulo': { 
       name: 'São Paulo', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/sao-paulo-fc-vector-logo.png',
+      flag: 'https://logodetimes.com/times/sao-paulo/logo-sao-paulo-256.png',
       colors: ['#ff0000', '#000000', '#ffffff']
     },
     'santos': { 
       name: 'Santos', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/santos-vector-logo.png',
+      flag: 'https://logodetimes.com/times/santos/logo-santos-256.png',
       colors: ['#000000', '#ffffff']
     },
     'grêmio': { 
       name: 'Grêmio', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/gremio-vector-logo.png',
+      flag: 'https://logodetimes.com/times/gremio/logo-gremio-256.png',
       colors: ['#0000ff', '#000000', '#ffffff']
     },
     'internacional': { 
       name: 'Internacional', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/internacional-vector-logo.png',
+      flag: 'https://logodetimes.com/times/internacional/logo-internacional-256.png',
       colors: ['#ff0000', '#ffffff']
     },
     'atlético-mg': { 
       name: 'Atlético-MG', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/atletico-mineiro-vector-logo.png',
+      flag: 'https://logodetimes.com/times/atletico-mg/logo-atletico-mg-256.png',
       colors: ['#000000', '#ffffff']
     },
     'cruzeiro': { 
       name: 'Cruzeiro', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/cruzeiro-vector-logo.png',
+      flag: 'https://logodetimes.com/times/cruzeiro/logo-cruzeiro-256.png',
       colors: ['#0000ff', '#ffffff']
     },
     'botafogo': { 
       name: 'Botafogo', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/botafogo-vector-logo.png',
+      flag: 'https://logodetimes.com/times/botafogo/logo-botafogo-256.png',
       colors: ['#000000', '#ffffff']
     },
     'vasco': { 
       name: 'Vasco', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/vasco-da-gama-vector-logo.png',
+      flag: 'https://logodetimes.com/times/vasco-da-gama/logo-vasco-da-gama-256.png',
       colors: ['#000000', '#ffffff']
     },
     'fluminense': { 
       name: 'Fluminense', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/fluminense-vector-logo.png',
+      flag: 'https://logodetimes.com/times/fluminense/logo-fluminense-256.png',
       colors: ['#800000', '#00ff00', '#ffffff']
     },
     'bahia': { 
       name: 'Bahia', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/bahia-vector-logo.png',
+      flag: 'https://logodetimes.com/times/bahia/logo-bahia-256.png',
       colors: ['#0000ff', '#ff0000', '#ffffff']
     },
     'vitória': { 
       name: 'Vitória', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/vitoria-vector-logo.png',
+      flag: 'https://logodetimes.com/times/vitoria/logo-vitoria-256.png',
       colors: ['#ff0000', '#000000']
     },
     'sport': { 
       name: 'Sport', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/sport-recife-vector-logo.png',
+      flag: 'https://logodetimes.com/times/sport/logo-sport-256.png',
       colors: ['#ff0000', '#000000']
     },
     'ceará': { 
       name: 'Ceará', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/ceara-vector-logo.png',
+      flag: 'https://logodetimes.com/times/ceara/logo-ceara-256.png',
       colors: ['#000000', '#ffffff']
     },
     'fortaleza': { 
       name: 'Fortaleza', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/fortaleza-vector-logo.png',
+      flag: 'https://logodetimes.com/times/fortaleza/logo-fortaleza-256.png',
       colors: ['#ff0000', '#0000ff', '#ffffff']
     },
     'coritiba': { 
       name: 'Coritiba', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/coritiba-vector-logo.png',
+      flag: 'https://logodetimes.com/times/coritiba/logo-coritiba-256.png',
       colors: ['#00ff00', '#ffffff']
     },
     'athletico-pr': { 
       name: 'Athletico-PR', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/atletico-paranaense-vector-logo.png',
+      flag: 'https://logodetimes.com/times/athletico-pr/logo-athletico-pr-256.png',
       colors: ['#ff0000', '#000000']
     },
     'goiás': { 
       name: 'Goiás', 
-      flag: 'https://logoeps.com/wp-content/uploads/2013/03/goias-vector-logo.png',
+      flag: 'https://logodetimes.com/times/goias/logo-goias-256.png',
       colors: ['#00ff00', '#ffffff']
+    },
+    // Times internacionais
+    'river plate (arg)': {
+      name: 'River Plate (ARG)',
+      flag: 'https://logodetimes.com/times/river-plate/logo-river-plate-256.png',
+      colors: ['#ff0000', '#ffffff']
+    },
+    'independiente (arg)': {
+      name: 'Independiente (ARG)',
+      flag: 'https://logodetimes.com/times/independiente/logo-independiente-256.png',
+      colors: ['#ff0000', '#ffffff']
+    },
+    // Seleções
+    'brasil': {
+      name: 'Brasil',
+      flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/CBF_logo.svg/240px-CBF_logo.svg.png',
+      colors: ['#ffff00', '#00ff00']
+    },
+    'argentina': {
+      name: 'Argentina',
+      flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/AFA_logo_%282017%29.svg/240px-AFA_logo_%282017%29.svg.png',
+      colors: ['#0066cc', '#ffffff']
     }
   };
 
@@ -142,7 +164,7 @@ export class TeamService {
     // Retorna um placeholder se não encontrar
     return {
       name: teamName,
-      flag: '/placeholder.svg',
+      flag: 'https://via.placeholder.com/32x32/cccccc/666666?text=?',
       colors: ['#333333', '#ffffff']
     };
   }

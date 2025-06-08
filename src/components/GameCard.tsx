@@ -1,3 +1,4 @@
+
 import { Calendar, Clock, MapPin, Tv, Trophy, Globe, Flag, Crown, Award, Star, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,15 +29,17 @@ const TeamFlag = ({ teamName }: { teamName: string }) => {
   const teamInfo = teamService.getTeamInfo(teamName);
 
   return (
-    <img 
-      src={teamInfo?.flag} 
-      alt={`Escudo ${teamName}`}
-      className="w-5 h-5 object-contain flex-shrink-0"
-      onError={(e) => {
-        const target = e.target as HTMLImageElement;
-        target.style.display = 'none';
-      }}
-    />
+    <div className="w-6 h-6 flex items-center justify-center bg-white rounded-full shadow-sm border">
+      <img 
+        src={teamInfo?.flag} 
+        alt={`Escudo ${teamName}`}
+        className="w-5 h-5 object-contain"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.src = 'https://via.placeholder.com/32x32/cccccc/666666?text=?';
+        }}
+      />
+    </div>
   );
 };
 
@@ -83,17 +86,17 @@ const GameCard = ({ game }: GameCardProps) => {
           <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
             <div className="text-right flex-1">
               <div className="flex items-center justify-end gap-2 mb-1">
-                <p className="font-bold text-lg">{game.time_casa}</p>
+                <p className="font-bold text-sm truncate">{game.time_casa}</p>
                 <TeamFlag teamName={game.time_casa} />
               </div>
-              <p className="text-sm text-muted-foreground">Casa</p>
+              <p className="text-xs text-muted-foreground">Casa</p>
               {game.placar_casa !== undefined && (
-                <p className="text-2xl font-bold text-primary">{game.placar_casa}</p>
+                <p className="text-xl font-bold text-primary">{game.placar_casa}</p>
               )}
             </div>
             
-            <div className="mx-4 text-center">
-              <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+            <div className="mx-3 text-center">
+              <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center">
                 {game.status === 'finalizado' && game.placar_casa !== undefined ? (
                   <span className="text-xs font-bold">FT</span>
                 ) : game.status === 'ao_vivo' ? (
@@ -107,11 +110,11 @@ const GameCard = ({ game }: GameCardProps) => {
             <div className="text-left flex-1">
               <div className="flex items-center justify-start gap-2 mb-1">
                 <TeamFlag teamName={game.time_fora} />
-                <p className="font-bold text-lg">{game.time_fora}</p>
+                <p className="font-bold text-sm truncate">{game.time_fora}</p>
               </div>
-              <p className="text-sm text-muted-foreground">Visitante</p>
+              <p className="text-xs text-muted-foreground">Visitante</p>
               {game.placar_fora !== undefined && (
-                <p className="text-2xl font-bold text-primary">{game.placar_fora}</p>
+                <p className="text-xl font-bold text-primary">{game.placar_fora}</p>
               )}
             </div>
           </div>
@@ -132,7 +135,7 @@ const GameCard = ({ game }: GameCardProps) => {
         {/* Estádio */}
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
           <MapPin className="w-4 h-4" />
-          <span>{game.estadio}</span>
+          <span className="truncate">{game.estadio}</span>
         </div>
 
         {/* Transmissão */}
