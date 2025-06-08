@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GameDataService } from '@/services/gameDataService';
 import { FetchLog } from '@/types/game';
+import { CAMPEONATOS } from '@/config/campeonatos';
 import { useToast } from '@/hooks/use-toast';
 
 interface AdminPanelProps {
@@ -22,7 +23,7 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
     try {
       toast({
         title: "Iniciando atualização manual",
-        description: "Buscando dados mais recentes..."
+        description: "Buscando dados mais recentes de todos os campeonatos..."
       });
       
       await onDataUpdate();
@@ -71,13 +72,28 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
     );
   };
 
+  const getCampeonatoStats = () => {
+    const stats = Object.keys(CAMPEONATOS).reduce((acc, campId) => {
+      const campLogs = logs.filter(log => log.campeonato === campId);
+      const lastUpdate = campLogs[0];
+      acc[campId] = {
+        lastUpdate: lastUpdate?.timestamp || 'Nunca',
+        status: lastUpdate?.status || 'pending',
+        gamesFound: lastUpdate?.gamesFound || 0
+      };
+      return acc;
+    }, {} as Record<string, any>);
+    
+    return stats;
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="w-5 h-5" />
-            Painel de Administração
+            Painel de Administração - Todos os Campeonatos
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -89,12 +105,12 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
             {isLoading ? (
               <>
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                Atualizando...
+                Atualizando todos os campeonatos...
               </>
             ) : (
               <>
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Forçar Atualização Manual
+                Forçar Atualização Manual de Todos os Campeonatos
               </>
             )}
           </Button>
@@ -102,9 +118,10 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
       </Card>
 
       <Tabs defaultValue="logs" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="logs">Logs de Atualização</TabsTrigger>
           <TabsTrigger value="sources">Fontes de Dados</TabsTrigger>
+          <TabsTrigger value="status">Status dos Campeonatos</TabsTrigger>
         </TabsList>
         
         <TabsContent value="logs" className="space-y-4">
@@ -112,11 +129,11 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Clock className="w-5 h-5" />
-                Últimas 10 Atualizações
+                Últimas 50 Atualizações
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-96 overflow-y-auto">
                 {logs.length === 0 ? (
                   <p className="text-muted-foreground text-center py-4">
                     Nenhum log disponível
@@ -131,6 +148,9 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
                         <div className="flex items-center gap-2 mb-1">
                           {getStatusBadge(log.status)}
                           <span className="text-sm font-medium">{log.source}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {CAMPEONATOS[log.campeonato]?.nome || log.campeonato}
+                          </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-1">
                           {log.message}
@@ -157,11 +177,23 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
               <div className="space-y-3">
                 {GameDataService.getInstance().getDataSources().map((source, index) => (
                   <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
+                    <div className="flex-1">
                       <p className="font-medium">{source.name}</p>
                       <p className="text-sm text-muted-foreground">{source.url}</p>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {source.campeonatos.slice(0, 3).map(campId => (
+                          <Badge key={campId} variant="outline" className="text-xs">
+                            {CAMPEONATOS[campId]?.nome || campId}
+                          </Badge>
+                        ))}
+                        {source.campeonatos.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{source.campeonatos.length - 3} mais
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 ml-4">
                       <Badge variant={source.active ? "default" : "secondary"}>
                         Prioridade {source.priority}
                       </Badge>
@@ -171,6 +203,38 @@ const AdminPanel = ({ onDataUpdate, isLoading }: AdminPanelProps) => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="status" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Status dos Campeonatos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(getCampeonatoStats()).map(([campId, stats]) => {
+                  const campeonato = CAMPEONATOS[campId as keyof typeof CAMPEONATOS];
+                  if (!campeonato || !campeonato.ativo) return null;
+                  
+                  return (
+                    <div key={campId} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-sm">{campeonato.nome}</h4>
+                        {getStatusIcon(stats.status)}
+                      </div>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <p>Última atualização: {stats.lastUpdate === 'Nunca' ? 'Nunca' : formatTimestamp(stats.lastUpdate)}</p>
+                        <p>Jogos encontrados: {stats.gamesFound}</p>
+                        <Badge className={campeonato.cor}>
+                          {campeonato.categoria}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

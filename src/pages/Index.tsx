@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Search, Calendar, Trophy, Settings } from 'lucide-react';
+import { Search, Calendar, Trophy, Settings, Globe, Flag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,15 +9,17 @@ import { Button } from '@/components/ui/button';
 import GameCard from '@/components/GameCard';
 import AdminPanel from '@/components/AdminPanel';
 import { GameDataService } from '@/services/gameDataService';
-import { Game } from '@/types/game';
+import { Game, CampeonatoType } from '@/types/game';
+import { CAMPEONATOS, getCampeonatosByCategoria } from '@/config/campeonatos';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [filteredGames, setFilteredGames] = useState<Game[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSerie, setSelectedSerie] = useState<string>('all');
+  const [selectedCampeonato, setSelectedCampeonato] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -29,7 +31,7 @@ const Index = () => {
 
   useEffect(() => {
     filterGames();
-  }, [games, searchTerm, selectedSerie, selectedDate]);
+  }, [games, searchTerm, selectedCampeonato, selectedDate, selectedCategory]);
 
   const loadGames = async () => {
     setIsLoading(true);
@@ -59,13 +61,19 @@ const Index = () => {
       filtered = filtered.filter(game => 
         game.time_casa.toLowerCase().includes(searchTerm.toLowerCase()) ||
         game.time_fora.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        game.estadio.toLowerCase().includes(searchTerm.toLowerCase())
+        game.estadio.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        CAMPEONATOS[game.campeonato].nome.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Filtro por série
-    if (selectedSerie !== 'all') {
-      filtered = filtered.filter(game => game.serie === selectedSerie);
+    // Filtro por campeonato
+    if (selectedCampeonato !== 'all') {
+      filtered = filtered.filter(game => game.campeonato === selectedCampeonato);
+    }
+
+    // Filtro por categoria
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(game => CAMPEONATOS[game.campeonato].categoria === selectedCategory);
     }
 
     // Filtro por data
@@ -81,8 +89,8 @@ const Index = () => {
     return dates;
   };
 
-  const getGamesBySerie = (serie: 'A' | 'B' | 'C') => {
-    return filteredGames.filter(game => game.serie === serie);
+  const getGamesByCategory = (categoria: 'nacional' | 'internacional' | 'selecao') => {
+    return filteredGames.filter(game => CAMPEONATOS[game.campeonato].categoria === categoria);
   };
 
   const formatDateDisplay = (dateStr: string) => {
@@ -94,6 +102,10 @@ const Index = () => {
     });
   };
 
+  const campeonatosNacionais = getCampeonatosByCategoria('nacional');
+  const campeonatosInternacionais = getCampeonatosByCategoria('internacional');
+  const campeonatosSelecao = getCampeonatosByCategoria('selecao');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
       {/* Header */}
@@ -102,7 +114,12 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Trophy className="w-8 h-8" />
-              <h1 className="text-3xl font-bold">Horário do Jogo</h1>
+              <div>
+                <h1 className="text-3xl font-bold">Horário do Jogo</h1>
+                <p className="text-white/90 text-sm">
+                  Todos os campeonatos do futebol brasileiro
+                </p>
+              </div>
             </div>
             <Dialog>
               <DialogTrigger asChild>
@@ -119,41 +136,52 @@ const Index = () => {
               </DialogContent>
             </Dialog>
           </div>
-          <p className="text-white/90 mt-2">
-            Acompanhe todos os jogos do Campeonato Brasileiro
-          </p>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por time ou estádio..."
+                placeholder="Buscar por time, estádio ou campeonato..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
             
-            <Select value={selectedSerie} onValueChange={setSelectedSerie}>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecionar série" />
+                <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as séries</SelectItem>
-                <SelectItem value="A">Série A</SelectItem>
-                <SelectItem value="B">Série B</SelectItem>
-                <SelectItem value="C">Série C</SelectItem>
+                <SelectItem value="all">Todas as categorias</SelectItem>
+                <SelectItem value="nacional">Nacional</SelectItem>
+                <SelectItem value="internacional">Internacional</SelectItem>
+                <SelectItem value="selecao">Seleção</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedCampeonato} onValueChange={setSelectedCampeonato}>
+              <SelectTrigger>
+                <SelectValue placeholder="Campeonato" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os campeonatos</SelectItem>
+                {Object.values(CAMPEONATOS).filter(c => c.ativo).map(campeonato => (
+                  <SelectItem key={campeonato.id} value={campeonato.id}>
+                    {campeonato.nome}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
             <Select value={selectedDate} onValueChange={setSelectedDate}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecionar data" />
+                <SelectValue placeholder="Data" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas as datas</SelectItem>
@@ -167,13 +195,25 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Abas por série */}
+        {/* Abas por categoria */}
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="all">Todos os Jogos ({filteredGames.length})</TabsTrigger>
-            <TabsTrigger value="A">Série A ({getGamesBySerie('A').length})</TabsTrigger>
-            <TabsTrigger value="B">Série B ({getGamesBySerie('B').length})</TabsTrigger>
-            <TabsTrigger value="C">Série C ({getGamesBySerie('C').length})</TabsTrigger>
+            <TabsTrigger value="all" className="flex items-center gap-2">
+              <Trophy className="w-4 h-4" />
+              Todos ({filteredGames.length})
+            </TabsTrigger>
+            <TabsTrigger value="nacional" className="flex items-center gap-2">
+              <Flag className="w-4 h-4" />
+              Nacional ({getGamesByCategory('nacional').length})
+            </TabsTrigger>
+            <TabsTrigger value="internacional" className="flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              Internacional ({getGamesByCategory('internacional').length})
+            </TabsTrigger>
+            <TabsTrigger value="selecao" className="flex items-center gap-2">
+              <Flag className="w-4 h-4" />
+              Seleção ({getGamesByCategory('selecao').length})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="all">
@@ -196,10 +236,10 @@ const Index = () => {
             )}
           </TabsContent>
 
-          {(['A', 'B', 'C'] as const).map(serie => (
-            <TabsContent key={serie} value={serie}>
+          {(['nacional', 'internacional', 'selecao'] as const).map(categoria => (
+            <TabsContent key={categoria} value={categoria}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {getGamesBySerie(serie).map(game => (
+                {getGamesByCategory(categoria).map(game => (
                   <GameCard key={game.id} game={game} />
                 ))}
               </div>
@@ -210,10 +250,38 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="bg-slate-900 text-white py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-slate-400">
-            © 2025 Horário do Jogo - Dados atualizados automaticamente via integração CBF
-          </p>
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-bold text-lg mb-4">Campeonatos Nacionais</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                {campeonatosNacionais.map(camp => (
+                  <li key={camp.id}>{camp.nome}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg mb-4">Campeonatos Internacionais</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                {campeonatosInternacionais.map(camp => (
+                  <li key={camp.id}>{camp.nome}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg mb-4">Seleção Brasileira</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                {campeonatosSelecao.map(camp => (
+                  <li key={camp.id}>{camp.nome}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-700 mt-8 pt-4 text-center">
+            <p className="text-slate-400">
+              © 2025 Horário do Jogo - Dados atualizados automaticamente via múltiplas fontes
+            </p>
+          </div>
         </div>
       </footer>
     </div>
