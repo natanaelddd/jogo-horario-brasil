@@ -86,38 +86,6 @@ export class GameDataService {
     }
   }
 
-  async fetchWithFallback(campeonato?: CampeonatoType): Promise<{ games: Game[], log: FetchLog }> {
-    try {
-      const games = campeonato 
-        ? await this.fetchGamesByCampeonato(campeonato)
-        : await this.fetchAllGames();
-      
-      const log: FetchLog = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        status: 'success',
-        source: 'Supabase Database',
-        campeonato: campeonato || 'brasileiro-a',
-        gamesFound: games.length,
-        message: `Dados obtidos com sucesso do Supabase${campeonato ? ` para ${CAMPEONATOS[campeonato].nome}` : ''}`
-      };
-      
-      return { games, log };
-    } catch (error) {
-      const errorLog: FetchLog = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        status: 'error',
-        source: 'Supabase Database',
-        campeonato: campeonato || 'brasileiro-a',
-        gamesFound: 0,
-        message: `Erro ao buscar dados do Supabase: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
-      };
-      
-      throw new Error('Falha ao buscar dados do Supabase');
-    }
-  }
-
   async getFetchLogs(): Promise<FetchLog[]> {
     try {
       return await this.supabaseService.getFetchLogs();
