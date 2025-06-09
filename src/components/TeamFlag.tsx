@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface TeamFlagProps {
   teamName: string;
@@ -7,46 +7,49 @@ interface TeamFlagProps {
 }
 
 const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   const getTeamShieldUrl = (name: string) => {
-    // URLs dos escudos dos times brasileiros - usando CDN mais confiável
+    // URLs dos escudos dos times brasileiros - usando fontes mais confiáveis
     const teamShields: { [key: string]: string } = {
-      // Times brasileiros
-      'Flamengo': 'https://logoeps.com/wp-content/uploads/2013/03/flamengo-vector-logo.png',
-      'Palmeiras': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Palmeiras_logo.svg/200px-Palmeiras_logo.svg.png',
-      'Corinthians': 'https://logoeps.com/wp-content/uploads/2013/03/corinthians-vector-logo.png',
-      'São Paulo': 'https://logoeps.com/wp-content/uploads/2013/03/sao-paulo-vector-logo.png',
-      'Santos': 'https://logoeps.com/wp-content/uploads/2013/03/santos-vector-logo.png',
-      'Botafogo': 'https://logoeps.com/wp-content/uploads/2013/03/botafogo-vector-logo.png',
-      'Atlético-MG': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-mineiro-vector-logo.png',
-      'Cruzeiro': 'https://logoeps.com/wp-content/uploads/2013/03/cruzeiro-vector-logo.png',
-      'Grêmio': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Gremio_logo.svg/200px-Gremio_logo.svg.png',
-      'Internacional': 'https://logoeps.com/wp-content/uploads/2013/03/internacional-vector-logo.png',
-      'Fluminense': 'https://logoeps.com/wp-content/uploads/2013/03/fluminense-vector-logo.png',
-      'Vasco': 'https://logoeps.com/wp-content/uploads/2013/03/vasco-da-gama-vector-logo.png',
-      'Sport': 'https://logoeps.com/wp-content/uploads/2013/03/sport-recife-vector-logo.png',
-      'Ceará': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Ceara_logo.svg/200px-Ceara_logo.svg.png',
-      'Coritiba': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coritiba_logo.svg/200px-Coritiba_logo.svg.png',
-      'Vitória': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Vit%C3%B3ria_logo.svg/200px-Vit%C3%B3ria_logo.svg.png',
-      'Fortaleza': 'https://logoeps.com/wp-content/uploads/2013/03/fortaleza-vector-logo.png',
-      'Athletico-PR': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-paranaense-vector-logo.png',
-      'Bahia': 'https://logoeps.com/wp-content/uploads/2013/03/bahia-vector-logo.png',
-      'Bragantino': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/RB_Bragantino_logo.svg/200px-RB_Bragantino_logo.svg.png',
-      'Juventude': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Juventude_logo.svg/200px-Juventude_logo.svg.png',
-      'Cuiabá': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Cuiab%C3%A1_Esporte_Clube_logo.svg/200px-Cuiab%C3%A1_Esporte_Clube_logo.svg.png',
-      'Atlético-GO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Atletico_Goianiense_logo.svg/200px-Atletico_Goianiense_logo.svg.png',
-      'Chapecoense': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Chapecoense_logo.svg/200px-Chapecoense_logo.svg.png',
+      // Times brasileiros - URLs mais estáveis
+      'Flamengo': 'https://assets.api-sports.io/football/teams/127.png',
+      'Palmeiras': 'https://assets.api-sports.io/football/teams/128.png',
+      'Corinthians': 'https://assets.api-sports.io/football/teams/131.png',
+      'São Paulo': 'https://assets.api-sports.io/football/teams/126.png',
+      'Santos': 'https://assets.api-sports.io/football/teams/130.png',
+      'Botafogo': 'https://assets.api-sports.io/football/teams/124.png',
+      'Atlético-MG': 'https://assets.api-sports.io/football/teams/121.png',
+      'Cruzeiro': 'https://assets.api-sports.io/football/teams/122.png',
+      'Grêmio': 'https://assets.api-sports.io/football/teams/153.png',
+      'Internacional': 'https://assets.api-sports.io/football/teams/123.png',
+      'Fluminense': 'https://assets.api-sports.io/football/teams/125.png',
+      'Vasco': 'https://assets.api-sports.io/football/teams/129.png',
+      'Athletico-PR': 'https://assets.api-sports.io/football/teams/134.png',
+      'Bahia': 'https://assets.api-sports.io/football/teams/142.png',
+      'Fortaleza': 'https://assets.api-sports.io/football/teams/139.png',
+      'Bragantino': 'https://assets.api-sports.io/football/teams/143.png',
+      'Juventude': 'https://assets.api-sports.io/football/teams/154.png',
+      'Cuiabá': 'https://assets.api-sports.io/football/teams/1064.png',
+      'Atlético-GO': 'https://assets.api-sports.io/football/teams/140.png',
+      'Ceará': 'https://assets.api-sports.io/football/teams/157.png',
+      'Coritiba': 'https://assets.api-sports.io/football/teams/155.png',
+      'Vitória': 'https://assets.api-sports.io/football/teams/150.png',
+      'Sport': 'https://assets.api-sports.io/football/teams/138.png',
+      'Chapecoense': 'https://assets.api-sports.io/football/teams/151.png',
       
       // Seleções das Eliminatórias
-      'Brasil': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/200px-Flag_of_Brazil.svg.png',
-      'Argentina': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/200px-Flag_of_Argentina.svg.png',
-      'Uruguai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_Uruguay.svg/200px-Flag_of_Uruguay.svg.png',
-      'Colômbia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/200px-Flag_of_Colombia.svg.png',
-      'Chile': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Flag_of_Chile.svg/200px-Flag_of_Chile.svg.png',
-      'Peru': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Peru.svg/200px-Flag_of_Peru.svg.png',
-      'Equador': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Flag_of_Ecuador.svg/200px-Flag_of_Ecuador.svg.png',
-      'Paraguai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Paraguay.svg/200px-Flag_of_Paraguay.svg.png',
-      'Bolívia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Bolivia.svg/200px-Flag_of_Bolivia.svg.png',
-      'Venezuela': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Flag_of_Venezuela.svg/200px-Flag_of_Venezuela.svg.png'
+      'Brasil': 'https://assets.api-sports.io/football/teams/6.png',
+      'Argentina': 'https://assets.api-sports.io/football/teams/26.png',
+      'Uruguai': 'https://assets.api-sports.io/football/teams/7.png',
+      'Colômbia': 'https://assets.api-sports.io/football/teams/8.png',
+      'Chile': 'https://assets.api-sports.io/football/teams/9.png',
+      'Peru': 'https://assets.api-sports.io/football/teams/2382.png',
+      'Equador': 'https://assets.api-sports.io/football/teams/2382.png',
+      'Paraguai': 'https://assets.api-sports.io/football/teams/11.png',
+      'Bolívia': 'https://assets.api-sports.io/football/teams/12.png',
+      'Venezuela': 'https://assets.api-sports.io/football/teams/2383.png'
     };
     
     return teamShields[name];
@@ -55,33 +58,36 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
   const getTeamColor = (name: string) => {
     // Cores características dos times brasileiros como fallback
     const teamColors: { [key: string]: string } = {
-      'Flamengo': 'bg-red-600',
-      'Palmeiras': 'bg-green-700',
-      'Corinthians': 'bg-gray-800',
-      'São Paulo': 'bg-red-700',
-      'Santos': 'bg-gray-900',
-      'Botafogo': 'bg-gray-900',
-      'Atlético-MG': 'bg-gray-800',
-      'Cruzeiro': 'bg-blue-600',
-      'Grêmio': 'bg-blue-700',
-      'Internacional': 'bg-red-700',
-      'Fluminense': 'bg-red-600',
-      'Vasco': 'bg-gray-900',
-      'Sport': 'bg-red-600',
-      'Ceará': 'bg-gray-800',
-      'Coritiba': 'bg-green-600',
-      'Vitória': 'bg-red-700',
-      'Fortaleza': 'bg-blue-600',
-      'Athletico-PR': 'bg-red-600',
-      'Bahia': 'bg-blue-600',
-      'Bragantino': 'bg-red-600',
-      'Juventude': 'bg-green-600',
-      'Cuiabá': 'bg-yellow-600',
-      'Atlético-GO': 'bg-red-600',
-      'Chapecoense': 'bg-green-600'
+      'Flamengo': 'from-red-600 to-red-700',
+      'Palmeiras': 'from-green-700 to-green-800',
+      'Corinthians': 'from-gray-800 to-gray-900',
+      'São Paulo': 'from-red-700 to-red-800',
+      'Santos': 'from-gray-700 to-gray-800',
+      'Botafogo': 'from-gray-900 to-black',
+      'Atlético-MG': 'from-gray-800 to-gray-900',
+      'Cruzeiro': 'from-blue-600 to-blue-700',
+      'Grêmio': 'from-blue-700 to-blue-800',
+      'Internacional': 'from-red-700 to-red-800',
+      'Fluminense': 'from-red-600 to-red-700',
+      'Vasco': 'from-gray-900 to-black',
+      'Sport': 'from-red-600 to-red-700',
+      'Ceará': 'from-gray-800 to-gray-900',
+      'Coritiba': 'from-green-600 to-green-700',
+      'Vitória': 'from-red-700 to-red-800',
+      'Fortaleza': 'from-blue-600 to-blue-700',
+      'Athletico-PR': 'from-red-600 to-red-700',
+      'Bahia': 'from-blue-600 to-blue-700',
+      'Bragantino': 'from-red-600 to-red-700',
+      'Juventude': 'from-green-600 to-green-700',
+      'Cuiabá': 'from-yellow-600 to-yellow-700',
+      'Atlético-GO': 'from-red-600 to-red-700',
+      'Chapecoense': 'from-green-600 to-green-700',
+      'Brasil': 'from-yellow-400 to-green-600',
+      'Argentina': 'from-blue-400 to-blue-600',
+      'Uruguai': 'from-blue-600 to-blue-800'
     };
     
-    return teamColors[name] || 'bg-primary';
+    return teamColors[name] || 'from-primary to-primary/80';
   };
 
   const getInitials = (name: string) => {
@@ -95,38 +101,44 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
   const shieldUrl = getTeamShieldUrl(teamName);
   const teamColor = getTeamColor(teamName);
 
+  const handleImageError = () => {
+    console.log(`Erro ao carregar escudo do ${teamName}:`, shieldUrl);
+    setImageError(true);
+  };
+
+  const handleImageLoad = () => {
+    console.log(`Escudo carregado com sucesso para ${teamName}:`, shieldUrl);
+    setImageLoaded(true);
+  };
+
   return (
     <div 
-      className="flex items-center justify-center rounded-full relative overflow-hidden shadow-sm border bg-card"
+      className="team-flag-container relative"
       style={{ width: size, height: size }}
     >
-      {shieldUrl ? (
-        <img 
-          src={shieldUrl}
-          alt={`Escudo ${teamName}`}
-          className="w-full h-full object-contain p-0.5"
-          style={{ maxWidth: '100%', maxHeight: '100%' }}
-          onError={(e) => {
-            console.log(`Erro ao carregar escudo do ${teamName}:`, shieldUrl);
-            // Em caso de erro na imagem, substitui por um fallback com iniciais
-            const target = e.target as HTMLImageElement;
-            const parent = target.parentElement;
-            if (parent) {
-              parent.innerHTML = `
-                <div class="w-full h-full ${teamColor} text-white rounded-full flex items-center justify-center font-bold text-xs">
-                  ${getInitials(teamName)}
-                </div>
-              `;
-            }
-          }}
-          onLoad={() => {
-            console.log(`Escudo carregado com sucesso para ${teamName}:`, shieldUrl);
-          }}
-        />
+      {shieldUrl && !imageError ? (
+        <>
+          {/* Loading placeholder enquanto a imagem carrega */}
+          {!imageLoaded && (
+            <div className={`absolute inset-0 bg-gradient-to-br ${teamColor} text-white rounded-full flex items-center justify-center font-bold team-flag-fallback animate-pulse`}>
+              {getInitials(teamName)}
+            </div>
+          )}
+          
+          <img 
+            src={shieldUrl}
+            alt={`Escudo ${teamName}`}
+            className={`w-full h-full object-contain p-0.5 transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            style={{ maxWidth: '100%', maxHeight: '100%' }}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+            loading="lazy"
+          />
+        </>
       ) : (
-        // Fallback para times sem escudo definido
+        // Fallback para times sem escudo definido ou com erro
         <div 
-          className={`w-full h-full ${teamColor} text-white rounded-full flex items-center justify-center font-bold text-xs`}
+          className={`w-full h-full bg-gradient-to-br ${teamColor} text-white rounded-full flex items-center justify-center font-bold team-flag-fallback`}
         >
           {getInitials(teamName)}
         </div>

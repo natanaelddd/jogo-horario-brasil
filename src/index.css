@@ -53,6 +53,8 @@
     --uefa-border: 220 26% 25%;
     --uefa-gradient-start: 264 83% 58%;
     --uefa-gradient-end: 220 83% 58%;
+    --uefa-hover: 264 83% 68%;
+    --uefa-hover-bg: 220 26% 25%;
   }
 
   .light {
@@ -131,9 +133,20 @@
   }
 
   .uefa-glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(100, 116, 139, 0.1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(100, 116, 139, 0.2);
+  }
+
+  .hover-uefa {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .hover-uefa:hover {
+    background-color: hsl(var(--uefa-hover-bg));
+    color: hsl(var(--uefa-hover));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(164, 84, 255, 0.3);
   }
 }
 
@@ -142,6 +155,7 @@
   background: linear-gradient(135deg, hsl(var(--uefa-dark)) 0%, hsl(220 26% 16%) 100%);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid hsl(var(--uefa-border));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .uefa-table {
@@ -149,6 +163,7 @@
   border: 1px solid hsl(var(--uefa-border));
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 .uefa-table-header {
@@ -157,7 +172,42 @@
 }
 
 .uefa-table-row:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(164, 84, 255, 0.08);
+  border-left: 3px solid hsl(var(--uefa-purple));
+  transition: all 0.2s ease;
+}
+
+.uefa-banner {
+  background: linear-gradient(135deg, hsl(var(--uefa-card)) 0%, hsl(220 26% 20%) 100%);
+  border: 1px solid hsl(var(--uefa-border));
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.uefa-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(164, 84, 255, 0.2);
+  border-color: hsl(var(--uefa-purple));
+}
+
+.team-flag-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, hsl(var(--uefa-card)) 0%, hsl(220 26% 22%) 100%);
+  border: 2px solid hsl(var(--uefa-border));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.team-flag-fallback {
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
 }
 
 /* Google Material Icons customization */
@@ -176,4 +226,42 @@
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'liga';
+}
+
+/* Melhorias nos links e botões */
+.nav-link {
+  @apply transition-all duration-200 ease-in-out relative;
+}
+
+.nav-link:hover {
+  color: hsl(var(--uefa-purple));
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: hsl(var(--uefa-purple));
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.btn-uefa {
+  background: linear-gradient(135deg, hsl(var(--uefa-purple)) 0%, hsl(220 83% 58%) 100%);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(164, 84, 255, 0.3);
+}
+
+.btn-uefa:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(164, 84, 255, 0.4);
+  background: linear-gradient(135deg, hsl(var(--uefa-hover)) 0%, hsl(220 83% 68%) 100%);
 }

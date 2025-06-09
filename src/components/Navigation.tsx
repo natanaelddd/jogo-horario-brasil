@@ -63,7 +63,7 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
               <Logo />
-              <Link to="/" className="text-xl font-bold text-primary">
+              <Link to="/" className="text-xl font-bold text-primary nav-link">
                 Brasileirão
               </Link>
             </div>
@@ -74,7 +74,7 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
                 disabled={isLoading}
                 variant="ghost"
                 size="sm"
-                className="text-foreground hover:text-primary"
+                className="text-foreground hover-uefa"
               >
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               </Button>
@@ -83,7 +83,7 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-foreground hover:text-primary"
+                className="text-foreground hover-uefa"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
@@ -91,16 +91,16 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
           </div>
 
           {mobileMenuOpen && (
-            <div className="border-t border-uefa pb-4">
+            <div className="border-t border-uefa pb-4 uefa-glass">
               <div className="space-y-1 pt-4">
                 {menuItems.map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                       location.pathname === item.href
-                        ? 'bg-primary/20 text-primary'
-                        : 'text-foreground hover:bg-muted'
+                        ? 'bg-primary/20 text-primary border border-primary/30'
+                        : 'text-foreground hover-uefa'
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -109,15 +109,15 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
                   </Link>
                 ))}
                 
-                <div className="border-t border-uefa mt-2 pt-2">
-                  <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase">
+                <div className="border-t border-uefa mt-4 pt-4">
+                  <p className="px-3 py-1 text-xs font-semibold text-primary uppercase tracking-wider">
                     Campeonatos
                   </p>
                   {campeonatos.map((camp) => (
                     <Link
                       key={camp.href}
                       to={camp.href}
-                      className="block px-3 py-2 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                      className="block px-3 py-3 text-sm text-foreground hover-uefa rounded-lg transition-all duration-200 ml-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {camp.name}
@@ -139,21 +139,21 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
               <Logo />
-              <Link to="/" className="text-xl font-bold text-primary">
+              <Link to="/" className="text-xl font-bold text-primary nav-link">
                 Brasileirão 2024
               </Link>
             </div>
 
             <Menubar className="border-none bg-transparent">
               <MenubarMenu>
-                <MenubarTrigger className="cursor-pointer text-foreground hover:text-primary">
+                <MenubarTrigger className="cursor-pointer text-foreground hover-uefa px-4 py-2 rounded-md">
                   <Trophy className="w-4 h-4 mr-2" />
                   Campeonatos
                 </MenubarTrigger>
-                <MenubarContent className="min-w-48 bg-card border-uefa">
+                <MenubarContent className="min-w-48 bg-card border-uefa uefa-glass">
                   {campeonatos.map((camp) => (
                     <MenubarItem key={camp.href} asChild>
-                      <Link to={camp.href} className="cursor-pointer text-foreground hover:text-primary">
+                      <Link to={camp.href} className="cursor-pointer text-foreground hover-uefa px-3 py-2 rounded-md">
                         {camp.name}
                       </Link>
                     </MenubarItem>
@@ -163,7 +163,7 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
 
               <MenubarMenu>
                 <MenubarTrigger asChild>
-                  <Link to="/eliminatorias" className="cursor-pointer text-foreground hover:text-primary">
+                  <Link to="/eliminatorias" className="cursor-pointer text-foreground hover-uefa px-4 py-2 rounded-md">
                     <Globe className="w-4 h-4 mr-2" />
                     Eliminatórias
                   </Link>
@@ -183,7 +183,7 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
               disabled={isLoading}
               variant="outline"
               size="sm"
-              className="flex items-center gap-2 border-uefa text-foreground hover:text-primary hover:border-primary"
+              className="flex items-center gap-2 border-uefa text-foreground hover-uefa"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Atualizar</span>
@@ -193,7 +193,7 @@ const Navigation = ({ onRefresh, onShowAdmin, isLoading }: NavigationProps) => {
               onClick={onShowAdmin}
               variant="ghost"
               size="sm"
-              className="flex items-center gap-2 text-foreground hover:text-primary"
+              className="flex items-center gap-2 text-foreground hover-uefa"
             >
               <Settings className="w-4 h-4" />
               <span className="hidden sm:inline">Admin</span>
