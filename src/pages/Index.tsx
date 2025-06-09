@@ -1,256 +1,221 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RefreshCw, Settings, Trophy, Globe, Flag, Crown, Award, Star, Zap } from 'lucide-react';
-import { GameDataService } from '@/services/gameDataService';
-import { Game, CampeonatoType } from '@/types/game';
-import { CAMPEONATOS } from '@/config/campeonatos';
-import GameCard from '@/components/GameCard';
+import { toast } from "sonner";
+import Navigation from '@/components/Navigation';
+import AppHeader from '@/components/AppHeader';
 import AdminPanel from '@/components/AdminPanel';
-import BannerDisplay from '@/components/BannerDisplay';
-import Logo from '@/components/Logo';
-import { useToast } from '@/hooks/use-toast';
+import AdminLogin from '@/components/AdminLogin';
+import ViewSelector from '@/components/ViewSelector';
+import GamesView from '@/components/GamesView';
+import StandingsView from '@/components/StandingsView';
+import CampeonatosView from '@/components/CampeonatosView';
+import CampeonatoFilter from '@/components/CampeonatoFilter';
+import HeroGameSection from '@/components/HeroGameSection';
+import GameCard from '@/components/GameCard';
+import { GameDataService } from '@/services/gameDataService';
+import { AuthService } from '@/services/authService';
+import { CampeonatoType, Game } from '@/types/game';
+import { Card, CardContent } from '@/components/ui/card';
+import { RefreshCw, Trophy } from 'lucide-react';
 
 const Index = () => {
-  const [showAdmin, setShowAdmin] = useState(false);
+  const [currentView, setCurrentView] = useState<'games' | 'standings' | 'campeonatos'>('games');
   const [selectedCampeonato, setSelectedCampeonato] = useState<CampeonatoType | 'todos'>('todos');
-  const { toast } = useToast();
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const { data: games = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['games', selectedCampeonato],
-    queryFn: async () => {
-      const gameService = GameDataService.getInstance();
-      if (selectedCampeonato === 'todos') {
-        return await gameService.fetchAllGames();
-      } else {
-        return await gameService.fetchGamesByCampeonato(selectedCampeonato);
-      }
-    },
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+  const { data: games = [], isLoading, refetch } = useQuery({
+    queryKey: ['games'],
+    queryFn: () => GameDataService.getInstance().fetchAllGames(),
+    refetchInterval: 30000, // Atualiza a cada 30 segundos
   });
 
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Erro ao carregar jogos",
-        description: "Não foi possível carregar os dados dos jogos. Tente novamente.",
-        variant: "destructive"
-      });
-    }
-  }, [error, toast]);
-
-  const handleManualRefresh = async () => {
+  const handleRefresh = async () => {
     try {
       await refetch();
-      toast({
-        title: "Dados atualizados",
-        description: "Os jogos foram atualizados com sucesso!"
-      });
-    } catch {
-      toast({
-        title: "Erro na atualização",
-        description: "Falha ao atualizar os dados",
-        variant: "destructive"
-      });
+      toast.success("Dados atualizados com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao atualizar dados");
     }
   };
 
-  const getIconComponent = (iconName: string) => {
-    const icons = { Trophy, Globe, Flag, Crown, Award, Star, Zap };
-    return icons[iconName as keyof typeof icons] || Trophy;
+  const handleAdminLogin = async (password: string) => {
+    try {
+      const authService = AuthService.getInstance();
+      const success = authService.login('horariodojogo', password);
+      if (success) {
+        setIsAuthenticated(true);
+        toast.success("Login realizado com sucesso!");
+      } else {
+        toast.error("Senha incorreta");
+      }
+    } catch (error) {
+      toast.error("Erro no login");
+    }
   };
 
+  const handleLogout = () => {
+    AuthService.getInstance().logout();
+    setIsAuthenticated(false);
+    setShowAdminPanel(false);
+    toast.success("Logout realizado com sucesso!");
+  };
+
+  const handleViewChange = (view: 'jogos' | 'classificacao' | 'campeonato') => {
+    const viewMap = {
+      'jogos': 'games',
+      'classificacao': 'standings',
+      'campeonato': 'campeonatos'
+    } as const;
+    setCurrentView(viewMap[view]);
+  };
+
+  // Filtrar jogos por campeonato
   const filteredGames = selectedCampeonato === 'todos' 
     ? games 
     : games.filter(game => game.campeonato === selectedCampeonato);
 
-  const activeCampeonatos = Object.entries(CAMPEONATOS).filter(([_, camp]) => camp.ativo);
-
-  if (showAdmin) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 p-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold gradient-brasil bg-clip-text text-transparent">
-              Painel Administrativo
-            </h1>
-            <Button variant="outline" onClick={() => setShowAdmin(false)}>
-              Voltar ao Site
-            </Button>
-          </div>
-          <AdminPanel onDataUpdate={handleManualRefresh} isLoading={isLoading} />
-        </div>
-      </div>
+  // Encontrar o próximo jogo mais relevante para o Hero Section
+  const getHeroGame = (games: Game[]): Game | null => {
+    if (games.length === 0) return null;
+    
+    // Priorizar jogos ao vivo
+    const liveGames = games.filter(game => game.status === 'ao_vivo');
+    if (liveGames.length > 0) return liveGames[0];
+    
+    // Depois jogos agendados da seleção brasileira
+    const brasilGames = games.filter(game => 
+      game.status === 'agendado' && 
+      (game.time_casa.toLowerCase().includes('brasil') || game.time_fora.toLowerCase().includes('brasil'))
     );
-  }
+    if (brasilGames.length > 0) return brasilGames[0];
+    
+    // Por último, qualquer jogo agendado
+    const scheduledGames = games.filter(game => game.status === 'agendado');
+    return scheduledGames.length > 0 ? scheduledGames[0] : games[0];
+  };
+
+  const heroGame = getHeroGame(filteredGames);
+  const remainingGames = filteredGames.filter(game => game.id !== heroGame?.id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header com Logo */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-6">
-            <Logo />
-          </div>
-          <p className="text-lg text-muted-foreground mb-4">
-            Acompanhe todos os jogos dos principais campeonatos
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
-            <Button 
-              onClick={handleManualRefresh}
-              disabled={isLoading}
-              className="gradient-brasil text-white font-semibold"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Atualizando...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Atualizar Dados
-                </>
-              )}
-            </Button>
+    <div className="min-h-screen bg-gray-900">
+      <Navigation 
+        onRefresh={handleRefresh}
+        onShowAdmin={() => setShowAdminPanel(true)}
+        isLoading={isLoading}
+      />
+      
+      <AppHeader />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <ViewSelector activeView={currentView === 'games' ? 'jogos' : currentView === 'standings' ? 'classificacao' : 'campeonato'} onViewChange={handleViewChange} />
+        
+        {currentView === 'games' && (
+          <div className="space-y-6">
+            {/* Hero Game Section */}
+            <HeroGameSection game={heroGame} />
             
-            <Button 
-              variant="outline" 
-              onClick={() => setShowAdmin(true)}
-              className="border-green-600 text-green-600 hover:bg-green-50"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Admin
-            </Button>
-          </div>
-        </div>
+            {/* Filtros por Campeonato */}
+            <CampeonatoFilter 
+              selectedCampeonato={selectedCampeonato}
+              onCampeonatoChange={setSelectedCampeonato}
+            />
 
-        <BannerDisplay type="top" />
-
-        {/* Filtros por Campeonato */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-center">Selecione o Campeonato</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={selectedCampeonato} onValueChange={(value) => setSelectedCampeonato(value as CampeonatoType | 'todos')}>
-              <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 h-auto p-2">
-                <TabsTrigger value="todos" className="flex items-center gap-2 p-3">
-                  <Trophy className="w-4 h-4" />
-                  Todos
-                </TabsTrigger>
-                {activeCampeonatos.map(([id, campeonato]) => {
-                  const IconComponent = getIconComponent(campeonato.icone);
-                  return (
-                    <TabsTrigger 
-                      key={id} 
-                      value={id}
-                      className="flex items-center gap-2 p-3 text-xs"
-                    >
-                      <IconComponent className="w-4 h-4" />
-                      <span className="hidden sm:inline">{campeonato.nome}</span>
-                      <span className="sm:hidden">{campeonato.nome.split(' ')[0]}</span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Lista de Jogos */}
-        <div className="space-y-4">
-          {isLoading ? (
-          <div className="text-center py-8">
-            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-            <p className="text-lg">Carregando jogos...</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Conectando com o banco de dados...
-            </p>
-          </div>
-        ) : error ? (
-          <Card className="text-center py-8 border-orange-200 bg-orange-50">
-            <CardContent>
-              <RefreshCw className="w-12 h-12 mx-auto mb-4 text-orange-600" />
-              <h3 className="text-lg font-semibold mb-2 text-orange-800">
-                Problema de Conectividade
-              </h3>
-              <p className="text-orange-700 mb-4">
-                Não foi possível conectar com o banco de dados. 
-                {filteredGames.length > 0 ? ' Exibindo dados de exemplo.' : ' Tente novamente em alguns instantes.'}
-              </p>
-              <Button 
-                onClick={handleManualRefresh}
-                className="bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Tentar Novamente
-              </Button>
-            </CardContent>
-          </Card>
-        ) : filteredGames.length === 0 ? (
-            <Card className="text-center py-8">
-              <CardContent>
-                <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">Nenhum jogo encontrado</h3>
-                <p className="text-muted-foreground">
-                  {selectedCampeonato === 'todos' 
-                    ? 'Não há jogos agendados no momento.' 
-                    : `Não há jogos agendados para ${CAMPEONATOS[selectedCampeonato as CampeonatoType]?.nome}.`
-                  }
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredGames.map((game) => (
-                <GameCard key={game.id} game={game} />
-              ))}
+            {/* Lista de Jogos */}
+            <div className="space-y-4">
+              {isLoading ? (
+                <div className="text-center py-8">
+                  <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-400" />
+                  <p className="text-lg text-white">Carregando jogos...</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Conectando com o banco de dados...
+                  </p>
+                </div>
+              ) : remainingGames.length === 0 ? (
+                <Card className="bg-gray-800 border-gray-700 text-center py-8">
+                  <CardContent>
+                    <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-500" />
+                    <h3 className="text-lg font-semibold mb-2 text-white">Nenhum jogo encontrado</h3>
+                    <p className="text-gray-400">
+                      {selectedCampeonato === 'todos' 
+                        ? 'Não há jogos agendados no momento.' 
+                        : `Não há jogos agendados para este campeonato.`
+                      }
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {remainingGames.map((game) => (
+                    <GameCard key={game.id} game={game} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Estatísticas */}
-        {filteredGames.length > 0 && (
-          <Card className="mt-8">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold gradient-brasil bg-clip-text text-transparent">
-                    {filteredGames.length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Total de Jogos</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-green-600">
-                    {filteredGames.filter(g => g.status === 'agendado').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Agendados</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-red-600">
-                    {filteredGames.filter(g => g.status === 'ao_vivo').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Ao Vivo</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-600">
-                    {filteredGames.filter(g => g.status === 'finalizado').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Finalizados</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Estatísticas */}
+            {filteredGames.length > 0 && (
+              <Card className="bg-gray-800 border-gray-700 mt-8">
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                      <p className="text-2xl font-bold text-purple-400">
+                        {filteredGames.length}
+                      </p>
+                      <p className="text-sm text-gray-400">Total de Jogos</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-green-400">
+                        {filteredGames.filter(g => g.status === 'agendado').length}
+                      </p>
+                      <p className="text-sm text-gray-400">Agendados</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-red-400">
+                        {filteredGames.filter(g => g.status === 'ao_vivo').length}
+                      </p>
+                      <p className="text-sm text-gray-400">Ao Vivo</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-400">
+                        {filteredGames.filter(g => g.status === 'finalizado').length}
+                      </p>
+                      <p className="text-sm text-gray-400">Finalizados</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+        {currentView === 'standings' && <StandingsView selectedCampeonato="todos" />}
+        {currentView === 'campeonatos' && (
+          <CampeonatosView 
+            onCampeonatoSelect={() => {}}
+            onViewChange={() => {}}
+          />
         )}
       </div>
+
+      {showAdminPanel && (
+        <>
+          {!isAuthenticated ? (
+            <AdminLogin 
+              onLogin={handleAdminLogin}
+              onClose={() => setShowAdminPanel(false)}
+            />
+          ) : (
+            <AdminPanel 
+              onDataUpdate={handleRefresh}
+              isLoading={isLoading}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 };
 
 export default Index;
+

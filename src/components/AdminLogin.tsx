@@ -7,10 +7,11 @@ import { AuthService } from '@/services/authService';
 import { useToast } from '@/hooks/use-toast';
 
 interface AdminLoginProps {
-  onLogin: () => void;
+  onLogin: (password: string) => void;
+  onClose?: () => void;
 }
 
-const AdminLogin = ({ onLogin }: AdminLoginProps) => {
+const AdminLogin = ({ onLogin, onClose }: AdminLoginProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -21,34 +22,27 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     setIsLoading(true);
     
     try {
-      const authService = AuthService.getInstance();
-      const success = authService.login(username, password);
-      
-      if (success) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo ao painel administrativo."
-        });
-        onLogin();
-      } else {
-        toast({
-          title: "Erro no login",
-          description: "Usuário ou senha incorretos.",
-          variant: "destructive"
-        });
-      }
+      onLogin(password);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center text-2xl gradient-brasil bg-clip-text text-transparent">
             Admin - Horário do Jogo
           </CardTitle>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">

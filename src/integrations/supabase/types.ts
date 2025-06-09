@@ -77,57 +77,212 @@ export type Database = {
       }
       games: {
         Row: {
+          arbitro: string | null
           campeonato: string
+          cartoes_amarelos_casa: number | null
+          cartoes_amarelos_fora: number | null
+          cartoes_vermelhos_casa: number | null
+          cartoes_vermelhos_fora: number | null
           created_at: string
           data: string
           estadio: string
           fase: string | null
           hora: string
           id: string
+          observacoes: string | null
           placar_casa: number | null
           placar_fora: number | null
+          publico: number | null
           rodada: number | null
           serie: string | null
           status: string | null
+          tempo_jogo: string | null
           time_casa: string
+          time_casa_id: string | null
           time_fora: string
+          time_fora_id: string | null
           transmissao: string[] | null
           updated_at: string
         }
         Insert: {
+          arbitro?: string | null
           campeonato: string
+          cartoes_amarelos_casa?: number | null
+          cartoes_amarelos_fora?: number | null
+          cartoes_vermelhos_casa?: number | null
+          cartoes_vermelhos_fora?: number | null
           created_at?: string
           data: string
           estadio: string
           fase?: string | null
           hora: string
           id?: string
+          observacoes?: string | null
           placar_casa?: number | null
           placar_fora?: number | null
+          publico?: number | null
           rodada?: number | null
           serie?: string | null
           status?: string | null
+          tempo_jogo?: string | null
           time_casa: string
+          time_casa_id?: string | null
           time_fora: string
+          time_fora_id?: string | null
           transmissao?: string[] | null
           updated_at?: string
         }
         Update: {
+          arbitro?: string | null
           campeonato?: string
+          cartoes_amarelos_casa?: number | null
+          cartoes_amarelos_fora?: number | null
+          cartoes_vermelhos_casa?: number | null
+          cartoes_vermelhos_fora?: number | null
           created_at?: string
           data?: string
           estadio?: string
           fase?: string | null
           hora?: string
           id?: string
+          observacoes?: string | null
           placar_casa?: number | null
           placar_fora?: number | null
+          publico?: number | null
           rodada?: number | null
           serie?: string | null
           status?: string | null
+          tempo_jogo?: string | null
           time_casa?: string
+          time_casa_id?: string | null
           time_fora?: string
+          time_fora_id?: string | null
           transmissao?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "games_time_casa_id_fkey"
+            columns: ["time_casa_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_time_fora_id_fkey"
+            columns: ["time_fora_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      standings: {
+        Row: {
+          aproveitamento: number | null
+          campeonato: string
+          created_at: string
+          derrotas: number
+          empates: number
+          gols_contra: number
+          gols_pro: number
+          id: string
+          jogos: number
+          pontos: number
+          posicao: number
+          saldo_gols: number | null
+          team_id: string
+          temporada: string
+          ultimos_jogos: string[] | null
+          updated_at: string
+          vitorias: number
+        }
+        Insert: {
+          aproveitamento?: number | null
+          campeonato: string
+          created_at?: string
+          derrotas?: number
+          empates?: number
+          gols_contra?: number
+          gols_pro?: number
+          id?: string
+          jogos?: number
+          pontos?: number
+          posicao: number
+          saldo_gols?: number | null
+          team_id: string
+          temporada?: string
+          ultimos_jogos?: string[] | null
+          updated_at?: string
+          vitorias?: number
+        }
+        Update: {
+          aproveitamento?: number | null
+          campeonato?: string
+          created_at?: string
+          derrotas?: number
+          empates?: number
+          gols_contra?: number
+          gols_pro?: number
+          id?: string
+          jogos?: number
+          pontos?: number
+          posicao?: number
+          saldo_gols?: number | null
+          team_id?: string
+          temporada?: string
+          ultimos_jogos?: string[] | null
+          updated_at?: string
+          vitorias?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standings_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          escudo_url: string | null
+          estadio: string | null
+          estado: string | null
+          fundacao: string | null
+          id: string
+          nome: string
+          nome_completo: string | null
+          sigla: string
+          updated_at: string
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          escudo_url?: string | null
+          estadio?: string | null
+          estado?: string | null
+          fundacao?: string | null
+          id?: string
+          nome: string
+          nome_completo?: string | null
+          sigla: string
+          updated_at?: string
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          escudo_url?: string | null
+          estadio?: string | null
+          estado?: string | null
+          fundacao?: string | null
+          id?: string
+          nome?: string
+          nome_completo?: string | null
+          sigla?: string
           updated_at?: string
         }
         Relationships: []
