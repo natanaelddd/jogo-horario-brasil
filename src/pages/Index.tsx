@@ -9,7 +9,6 @@ import AppHeader from '@/components/AppHeader';
 import AdminPanel from '@/components/AdminPanel';
 import AdminLogin from '@/components/AdminLogin';
 import ViewSelector from '@/components/ViewSelector';
-import GamesView from '@/components/GamesView';
 import StandingsView from '@/components/StandingsView';
 import CampeonatosView from '@/components/CampeonatosView';
 import CampeonatoFilter from '@/components/CampeonatoFilter';
@@ -55,13 +54,6 @@ const Index = () => {
     } catch (error) {
       toast.error("Erro no login");
     }
-  };
-
-  const handleLogout = () => {
-    AuthService.getInstance().logout();
-    setIsAuthenticated(false);
-    setShowAdminPanel(false);
-    toast.success("Logout realizado com sucesso!");
   };
 
   const handleViewChange = (view: 'jogos' | 'classificacao' | 'campeonato') => {
@@ -115,7 +107,10 @@ const Index = () => {
           <AppHeader />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <ViewSelector activeView={currentView === 'games' ? 'jogos' : currentView === 'standings' ? 'classificacao' : 'campeonato'} onViewChange={handleViewChange} />
+            <ViewSelector 
+              activeView={currentView === 'games' ? 'jogos' : currentView === 'standings' ? 'classificacao' : 'campeonato'} 
+              onViewChange={handleViewChange} 
+            />
             
             {currentView === 'games' && (
               <div className="space-y-6">
@@ -195,11 +190,18 @@ const Index = () => {
                 )}
               </div>
             )}
-            {currentView === 'standings' && <StandingsView selectedCampeonato="todos" />}
+            
+            {currentView === 'standings' && (
+              <StandingsView selectedCampeonato={selectedCampeonato} />
+            )}
+            
             {currentView === 'campeonatos' && (
               <CampeonatosView 
-                onCampeonatoSelect={() => {}}
-                onViewChange={() => {}}
+                onCampeonatoSelect={(campeonato) => {
+                  setSelectedCampeonato(campeonato);
+                  setCurrentView('games');
+                }}
+                onViewChange={handleViewChange}
               />
             )}
           </div>

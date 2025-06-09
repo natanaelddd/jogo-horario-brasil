@@ -1,5 +1,5 @@
 
-import { Home, Trophy, Globe, Settings, Calendar, Star, Zap, Crown, Award, Flag } from 'lucide-react';
+import { Home, Trophy, Globe, Settings, Flag, Crown, Award, Star, Zap } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -120,7 +120,7 @@ const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton 
               className="text-gray-400 hover:text-white hover:bg-gray-800"
-              onClick={() => {}}
+              onClick={() => console.log('Configurações clicadas')}
             >
               <Settings className="w-5 h-5" />
               <span>Configurações</span>

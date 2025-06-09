@@ -26,16 +26,6 @@ const TeamFlag: React.FC<TeamFlagProps> = ({ teamName, size = 32, className = ''
       'vasco': 'https://logoeps.com/wp-content/uploads/2013/03/vasco-da-gama-vector-logo.png',
       'fluminense': 'https://logoeps.com/wp-content/uploads/2013/03/fluminense-vector-logo.png',
       
-      // Times internacionais
-      'real madrid': 'https://logoeps.com/wp-content/uploads/2012/12/real-madrid-vector-logo.png',
-      'barcelona': 'https://logoeps.com/wp-content/uploads/2012/12/barcelona-vector-logo.png',
-      'manchester city': 'https://logoeps.com/wp-content/uploads/2013/03/manchester-city-vector-logo.png',
-      'manchester united': 'https://logoeps.com/wp-content/uploads/2013/03/manchester-united-vector-logo.png',
-      'chelsea': 'https://logoeps.com/wp-content/uploads/2013/03/chelsea-vector-logo.png',
-      'liverpool': 'https://logoeps.com/wp-content/uploads/2013/03/liverpool-vector-logo.png',
-      'bayern munich': 'https://logoeps.com/wp-content/uploads/2013/03/bayern-munchen-vector-logo.png',
-      'psg': 'https://logoeps.com/wp-content/uploads/2013/03/psg-vector-logo.png',
-      
       // Seleções
       'brasil': 'https://logoeps.com/wp-content/uploads/2013/03/brazil-national-football-team-vector-logo.png',
       'argentina': 'https://logoeps.com/wp-content/uploads/2013/03/argentina-national-football-team-vector-logo.png',
@@ -47,11 +37,6 @@ const TeamFlag: React.FC<TeamFlagProps> = ({ teamName, size = 32, className = ''
       'venezuela': 'https://logoeps.com/wp-content/uploads/2013/03/venezuela-national-football-team-vector-logo.png',
       'paraguai': 'https://logoeps.com/wp-content/uploads/2013/03/paraguay-national-football-team-vector-logo.png',
       'bolívia': 'https://logoeps.com/wp-content/uploads/2013/03/bolivia-national-football-team-vector-logo.png',
-      
-      // Times árabes
-      'al hilal': 'https://logoeps.com/wp-content/uploads/2017/05/al-hilal-vector-logo.png',
-      'al nassr': 'https://logoeps.com/wp-content/uploads/2017/05/al-nassr-vector-logo.png',
-      'al ahly': 'https://logoeps.com/wp-content/uploads/2017/05/al-ahly-vector-logo.png'
     };
 
     const normalizedTeam = team.toLowerCase().trim();
@@ -69,14 +54,14 @@ const TeamFlag: React.FC<TeamFlagProps> = ({ teamName, size = 32, className = ''
         height={size}
         className={`object-contain ${className}`}
         onError={(e) => {
-          // Fallback para ícone quando a imagem não carrega
           const target = e.target as HTMLImageElement;
           target.style.display = 'none';
           const parent = target.parentElement;
-          if (parent) {
-            const fallbackIcon = document.createElement('div');
-            fallbackIcon.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
-            parent.appendChild(fallbackIcon);
+          if (parent && !parent.querySelector('.fallback-icon')) {
+            const fallbackDiv = document.createElement('div');
+            fallbackDiv.className = 'fallback-icon flex items-center justify-center';
+            fallbackDiv.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
+            parent.appendChild(fallbackDiv);
           }
         }}
       />
