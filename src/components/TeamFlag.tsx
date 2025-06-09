@@ -9,10 +9,10 @@ interface TeamFlagProps {
 }
 
 const TeamFlag: React.FC<TeamFlagProps> = ({ teamName, size = 32, className = '' }) => {
-  // Mapeamento melhorado de times para URLs de brasões mais confiáveis
-  const getTeamLogo = (team: string): string => {
+  // Mapeamento de times brasileiros para logos reais
+  const getTeamLogo = (team: string): string | null => {
     const teamMap: { [key: string]: string } = {
-      // Brasileirão Série A
+      // Série A
       'flamengo': 'https://logoeps.com/wp-content/uploads/2013/03/flamengo-vector-logo.png',
       'palmeiras': 'https://logoeps.com/wp-content/uploads/2013/03/palmeiras-vector-logo.png',
       'corinthians': 'https://logoeps.com/wp-content/uploads/2013/03/corinthians-vector-logo.png',
@@ -25,6 +25,14 @@ const TeamFlag: React.FC<TeamFlagProps> = ({ teamName, size = 32, className = ''
       'botafogo': 'https://logoeps.com/wp-content/uploads/2013/03/botafogo-vector-logo.png',
       'vasco': 'https://logoeps.com/wp-content/uploads/2013/03/vasco-da-gama-vector-logo.png',
       'fluminense': 'https://logoeps.com/wp-content/uploads/2013/03/fluminense-vector-logo.png',
+      'bahia': 'https://logoeps.com/wp-content/uploads/2013/03/bahia-vector-logo.png',
+      'vitória': 'https://logoeps.com/wp-content/uploads/2013/03/vitoria-vector-logo.png',
+      'athletico-pr': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-paranaense-vector-logo.png',
+      'coritiba': 'https://logoeps.com/wp-content/uploads/2013/03/coritiba-vector-logo.png',
+      'fortaleza': 'https://logoeps.com/wp-content/uploads/2013/03/fortaleza-vector-logo.png',
+      'ceará': 'https://logoeps.com/wp-content/uploads/2013/03/ceara-vector-logo.png',
+      'sport': 'https://logoeps.com/wp-content/uploads/2013/03/sport-recife-vector-logo.png',
+      'chapecoense': 'https://logoeps.com/wp-content/uploads/2013/03/chapecoense-vector-logo.png',
       
       // Seleções
       'brasil': 'https://logoeps.com/wp-content/uploads/2013/03/brazil-national-football-team-vector-logo.png',
@@ -40,7 +48,7 @@ const TeamFlag: React.FC<TeamFlagProps> = ({ teamName, size = 32, className = ''
     };
 
     const normalizedTeam = team.toLowerCase().trim();
-    return teamMap[normalizedTeam];
+    return teamMap[normalizedTeam] || null;
   };
 
   const logoUrl = getTeamLogo(teamName);
@@ -68,7 +76,7 @@ const TeamFlag: React.FC<TeamFlagProps> = ({ teamName, size = 32, className = ''
     );
   }
 
-  // Fallback: ícone de escudo
+  // Fallback: ícone de escudo apenas se não encontrar logo
   return (
     <Shield 
       size={size} 

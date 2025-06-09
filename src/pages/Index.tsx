@@ -14,12 +14,11 @@ import CampeonatosView from '@/components/CampeonatosView';
 import CampeonatoFilter from '@/components/CampeonatoFilter';
 import HeroGameSection from '@/components/HeroGameSection';
 import GameCard from '@/components/GameCard';
-import NewsHighlight from '@/components/NewsHighlight';
 import { GameDataService } from '@/services/gameDataService';
 import { AuthService } from '@/services/authService';
 import { CampeonatoType, Game } from '@/types/game';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RefreshCw, Trophy, Newspaper, TrendingUp } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { RefreshCw, Trophy } from 'lucide-react';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'games' | 'standings' | 'campeonatos'>('games');
@@ -94,34 +93,6 @@ const Index = () => {
   const heroGame = getHeroGame(filteredGames);
   const remainingGames = filteredGames.filter(game => game.id !== heroGame?.id);
 
-  // Notícias mock para demonstração
-  const noticiasDestaque = [
-    {
-      title: 'Flamengo anuncia nova contratação para 2025',
-      summary: 'Clube carioca confirma chegada de atacante argentino por R$ 50 milhões',
-      category: 'Transferências',
-      publishDate: '2025-01-15T14:30:00',
-      views: 15420,
-      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400'
-    },
-    {
-      title: 'Seleção Brasileira divulga convocados',
-      summary: 'Dorival Jr. anuncia lista com 26 jogadores para Eliminatórias',
-      category: 'Seleção',
-      publishDate: '2025-01-15T10:15:00',
-      views: 12765,
-      imageUrl: 'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=400'
-    },
-    {
-      title: 'Palmeiras se prepara para Libertadores',
-      summary: 'Verdão intensifica treinos para estreia no torneio',
-      category: 'Libertadores',
-      publishDate: '2025-01-14T16:45:00',
-      views: 8932,
-      imageUrl: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400'
-    }
-  ];
-
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-900">
@@ -145,33 +116,6 @@ const Index = () => {
               <div className="space-y-6">
                 {/* Hero Game Section */}
                 <HeroGameSection game={heroGame} />
-                
-                {/* Seção de Notícias em Destaque */}
-                <Card className="bg-gray-800 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-white">
-                      <Newspaper className="w-6 h-6 text-purple-400" />
-                      Notícias em Destaque
-                      <TrendingUp className="w-5 h-5 text-green-400" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {noticiasDestaque.map((noticia, index) => (
-                        <NewsHighlight
-                          key={index}
-                          title={noticia.title}
-                          summary={noticia.summary}
-                          category={noticia.category}
-                          publishDate={noticia.publishDate}
-                          views={noticia.views}
-                          imageUrl={noticia.imageUrl}
-                          isMain={index === 0}
-                        />
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
 
                 {/* Filtros por Campeonato */}
                 <CampeonatoFilter 

@@ -1,5 +1,5 @@
 
-import { Home, Trophy, Globe, Settings, Flag, Crown, Award, Star, Zap, Users, Newspaper } from 'lucide-react';
+import { Home, Trophy, Globe, Settings, Flag, Crown, Award, Star, Zap, Users } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -30,12 +30,6 @@ const AppSidebar = () => {
       href: "/times",
       icon: Users,
       description: "Todos os times e suas estatísticas"
-    },
-    {
-      title: "Notícias",
-      href: "/noticias",
-      icon: Newspaper,
-      description: "Últimas notícias do futebol"
     },
     {
       title: "Eliminatórias",
