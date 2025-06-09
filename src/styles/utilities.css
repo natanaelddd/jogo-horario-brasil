@@ -1,0 +1,67 @@
+
+@layer utilities {
+  .gradient-uefa {
+    background: linear-gradient(135deg, hsl(var(--uefa-gradient-start)) 0%, hsl(var(--uefa-gradient-end)) 100%);
+  }
+  
+  .text-uefa-purple {
+    color: hsl(var(--uefa-purple));
+  }
+  
+  .bg-uefa-purple {
+    background-color: hsl(var(--uefa-purple));
+  }
+  
+  .bg-uefa-dark {
+    background-color: hsl(var(--uefa-dark));
+  }
+  
+  .bg-uefa-card {
+    background-color: hsl(var(--uefa-card));
+  }
+  
+  .border-uefa {
+    border-color: hsl(var(--uefa-border));
+  }
+
+  .uefa-glass {
+    background: rgba(100, 116, 139, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 116, 139, 0.2);
+  }
+
+  .hover-uefa {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .hover-uefa:hover {
+    background-color: hsl(var(--uefa-hover-bg));
+    color: hsl(var(--uefa-hover));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(164, 84, 255, 0.3);
+  }
+
+  .text-uefa-accent {
+    color: hsl(var(--uefa-accent));
+  }
+
+  .text-uefa-primary {
+    color: hsl(var(--uefa-text-primary));
+  }
+
+  .text-uefa-secondary {
+    color: hsl(var(--uefa-text-secondary));
+  }
+
+  /* Hover effects melhorados */
+  .hover-enhanced {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .hover-enhanced:hover {
+    background: linear-gradient(135deg, rgba(164, 84, 255, 0.15) 0%, rgba(164, 84, 255, 0.08) 100%);
+    border-color: hsl(var(--uefa-purple));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(164, 84, 255, 0.25);
+  }
+}
