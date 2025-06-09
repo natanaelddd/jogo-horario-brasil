@@ -2,6 +2,7 @@
 import { Game, FetchLog, DataSource, CampeonatoType } from '@/types/game';
 import { CAMPEONATOS } from '@/config/campeonatos';
 import { SupabaseGameService } from './supabaseGameService';
+import { EXAMPLE_GAMES, getExampleGamesByCampeonato, getAllExampleGames } from '@/data/exampleGames';
 
 export class GameDataService {
   private static instance: GameDataService;
@@ -24,6 +25,24 @@ export class GameDataService {
     try {
       const games = await this.supabaseService.fetchGamesByCampeonato(campeonato);
       
+      // Se não encontrou jogos no Supabase, usa dados de exemplo
+      if (games.length === 0) {
+        console.log('Nenhum jogo encontrado no Supabase, usando dados de exemplo');
+        const exampleGames = getExampleGamesByCampeonato(campeonato);
+        
+        // Log do fallback
+        await this.supabaseService.logFetch({
+          timestamp: new Date().toISOString(),
+          status: 'partial',
+          source: 'Example Data (Fallback)',
+          campeonato,
+          gamesFound: exampleGames.length,
+          message: `Usando dados de exemplo para ${CAMPEONATOS[campeonato].nome} - Supabase retornou 0 jogos`
+        });
+        
+        return exampleGames;
+      }
+      
       // Log da busca bem-sucedida
       await this.supabaseService.logFetch({
         timestamp: new Date().toISOString(),
@@ -38,17 +57,21 @@ export class GameDataService {
     } catch (error) {
       console.error('Erro ao buscar dados do Supabase:', error);
       
-      // Log do erro
+      // Em caso de erro, usa dados de exemplo
+      console.log('Erro na conexão com Supabase, usando dados de exemplo');
+      const exampleGames = getExampleGamesByCampeonato(campeonato);
+      
+      // Log do erro e fallback
       await this.supabaseService.logFetch({
         timestamp: new Date().toISOString(),
         status: 'error',
-        source: 'Supabase Database',
+        source: 'Example Data (Error Fallback)',
         campeonato,
-        gamesFound: 0,
-        message: `Erro ao buscar dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+        gamesFound: exampleGames.length,
+        message: `Erro ao buscar dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}. Usando dados de exemplo.`
       });
       
-      throw error;
+      return exampleGames;
     }
   }
 
@@ -57,6 +80,24 @@ export class GameDataService {
     
     try {
       const games = await this.supabaseService.fetchAllGames();
+      
+      // Se não encontrou jogos no Supabase, usa dados de exemplo
+      if (games.length === 0) {
+        console.log('Nenhum jogo encontrado no Supabase, usando dados de exemplo');
+        const exampleGames = getAllExampleGames();
+        
+        // Log do fallback
+        await this.supabaseService.logFetch({
+          timestamp: new Date().toISOString(),
+          status: 'partial',
+          source: 'Example Data (Fallback)',
+          campeonato: 'brasileiro-a', // campeonato padrão para logs gerais
+          gamesFound: exampleGames.length,
+          message: `Usando dados de exemplo - Supabase retornou 0 jogos`
+        });
+        
+        return exampleGames;
+      }
       
       // Log da busca bem-sucedida
       await this.supabaseService.logFetch({
@@ -72,17 +113,21 @@ export class GameDataService {
     } catch (error) {
       console.error('Erro ao buscar todos os jogos:', error);
       
-      // Log do erro
+      // Em caso de erro, usa dados de exemplo
+      console.log('Erro na conexão com Supabase, usando dados de exemplo');
+      const exampleGames = getAllExampleGames();
+      
+      // Log do erro e fallback
       await this.supabaseService.logFetch({
         timestamp: new Date().toISOString(),
         status: 'error',
-        source: 'Supabase Database',
+        source: 'Example Data (Error Fallback)',
         campeonato: 'brasileiro-a',
-        gamesFound: 0,
-        message: `Erro ao buscar todos os jogos: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+        gamesFound: exampleGames.length,
+        message: `Erro ao buscar todos os jogos: ${error instanceof Error ? error.message : 'Erro desconhecido'}. Usando dados de exemplo.`
       });
       
-      throw error;
+      return exampleGames;
     }
   }
 

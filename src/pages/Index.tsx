@@ -166,11 +166,34 @@ const Index = () => {
         {/* Lista de Jogos */}
         <div className="space-y-4">
           {isLoading ? (
-            <div className="text-center py-8">
-              <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-              <p className="text-lg">Carregando jogos...</p>
-            </div>
-          ) : filteredGames.length === 0 ? (
+          <div className="text-center py-8">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+            <p className="text-lg">Carregando jogos...</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Conectando com o banco de dados...
+            </p>
+          </div>
+        ) : error ? (
+          <Card className="text-center py-8 border-orange-200 bg-orange-50">
+            <CardContent>
+              <RefreshCw className="w-12 h-12 mx-auto mb-4 text-orange-600" />
+              <h3 className="text-lg font-semibold mb-2 text-orange-800">
+                Problema de Conectividade
+              </h3>
+              <p className="text-orange-700 mb-4">
+                Não foi possível conectar com o banco de dados. 
+                {filteredGames.length > 0 ? ' Exibindo dados de exemplo.' : ' Tente novamente em alguns instantes.'}
+              </p>
+              <Button 
+                onClick={handleManualRefresh}
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Tentar Novamente
+              </Button>
+            </CardContent>
+          </Card>
+        ) : filteredGames.length === 0 ? (
             <Card className="text-center py-8">
               <CardContent>
                 <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
