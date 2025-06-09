@@ -1,6 +1,9 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from "sonner";
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import AppSidebar from '@/components/AppSidebar';
 import Navigation from '@/components/Navigation';
 import AppHeader from '@/components/AppHeader';
 import AdminPanel from '@/components/AdminPanel';
@@ -27,7 +30,7 @@ const Index = () => {
   const { data: games = [], isLoading, refetch } = useQuery({
     queryKey: ['games'],
     queryFn: () => GameDataService.getInstance().fetchAllGames(),
-    refetchInterval: 30000, // Atualiza a cada 30 segundos
+    refetchInterval: 30000,
   });
 
   const handleRefresh = async () => {
@@ -99,123 +102,127 @@ const Index = () => {
   const remainingGames = filteredGames.filter(game => game.id !== heroGame?.id);
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      <Navigation 
-        onRefresh={handleRefresh}
-        onShowAdmin={() => setShowAdminPanel(true)}
-        isLoading={isLoading}
-      />
-      
-      <AppHeader />
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gray-900">
+        <AppSidebar />
+        <SidebarInset className="flex-1">
+          <Navigation 
+            onRefresh={handleRefresh}
+            onShowAdmin={() => setShowAdminPanel(true)}
+            isLoading={isLoading}
+          />
+          
+          <AppHeader />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <ViewSelector activeView={currentView === 'games' ? 'jogos' : currentView === 'standings' ? 'classificacao' : 'campeonato'} onViewChange={handleViewChange} />
-        
-        {currentView === 'games' && (
-          <div className="space-y-6">
-            {/* Hero Game Section */}
-            <HeroGameSection game={heroGame} />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <ViewSelector activeView={currentView === 'games' ? 'jogos' : currentView === 'standings' ? 'classificacao' : 'campeonato'} onViewChange={handleViewChange} />
             
-            {/* Filtros por Campeonato */}
-            <CampeonatoFilter 
-              selectedCampeonato={selectedCampeonato}
-              onCampeonatoChange={setSelectedCampeonato}
-            />
+            {currentView === 'games' && (
+              <div className="space-y-6">
+                {/* Hero Game Section */}
+                <HeroGameSection game={heroGame} />
+                
+                {/* Filtros por Campeonato */}
+                <CampeonatoFilter 
+                  selectedCampeonato={selectedCampeonato}
+                  onCampeonatoChange={setSelectedCampeonato}
+                />
 
-            {/* Lista de Jogos */}
-            <div className="space-y-4">
-              {isLoading ? (
-                <div className="text-center py-8">
-                  <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-400" />
-                  <p className="text-lg text-white">Carregando jogos...</p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    Conectando com o banco de dados...
-                  </p>
+                {/* Lista de Jogos */}
+                <div className="space-y-4">
+                  {isLoading ? (
+                    <div className="text-center py-8">
+                      <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-400" />
+                      <p className="text-lg text-white">Carregando jogos...</p>
+                      <p className="text-sm text-gray-400 mt-2">
+                        Conectando com o banco de dados...
+                      </p>
+                    </div>
+                  ) : remainingGames.length === 0 ? (
+                    <Card className="bg-gray-800 border-gray-700 text-center py-8">
+                      <CardContent>
+                        <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-500" />
+                        <h3 className="text-lg font-semibold mb-2 text-white">Nenhum jogo encontrado</h3>
+                        <p className="text-gray-400">
+                          {selectedCampeonato === 'todos' 
+                            ? 'Não há jogos agendados no momento.' 
+                            : `Não há jogos agendados para este campeonato.`
+                          }
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {remainingGames.map((game) => (
+                        <GameCard key={game.id} game={game} />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ) : remainingGames.length === 0 ? (
-                <Card className="bg-gray-800 border-gray-700 text-center py-8">
-                  <CardContent>
-                    <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-                    <h3 className="text-lg font-semibold mb-2 text-white">Nenhum jogo encontrado</h3>
-                    <p className="text-gray-400">
-                      {selectedCampeonato === 'todos' 
-                        ? 'Não há jogos agendados no momento.' 
-                        : `Não há jogos agendados para este campeonato.`
-                      }
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {remainingGames.map((game) => (
-                    <GameCard key={game.id} game={game} />
-                  ))}
-                </div>
-              )}
-            </div>
 
-            {/* Estatísticas */}
-            {filteredGames.length > 0 && (
-              <Card className="bg-gray-800 border-gray-700 mt-8">
-                <CardContent className="pt-6">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div>
-                      <p className="text-2xl font-bold text-purple-400">
-                        {filteredGames.length}
-                      </p>
-                      <p className="text-sm text-gray-400">Total de Jogos</p>
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-green-400">
-                        {filteredGames.filter(g => g.status === 'agendado').length}
-                      </p>
-                      <p className="text-sm text-gray-400">Agendados</p>
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-red-400">
-                        {filteredGames.filter(g => g.status === 'ao_vivo').length}
-                      </p>
-                      <p className="text-sm text-gray-400">Ao Vivo</p>
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-gray-400">
-                        {filteredGames.filter(g => g.status === 'finalizado').length}
-                      </p>
-                      <p className="text-sm text-gray-400">Finalizados</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* Estatísticas */}
+                {filteredGames.length > 0 && (
+                  <Card className="bg-gray-800 border-gray-700 mt-8">
+                    <CardContent className="pt-6">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                          <p className="text-2xl font-bold text-purple-400">
+                            {filteredGames.length}
+                          </p>
+                          <p className="text-sm text-gray-400">Total de Jogos</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-green-400">
+                            {filteredGames.filter(g => g.status === 'agendado').length}
+                          </p>
+                          <p className="text-sm text-gray-400">Agendados</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-red-400">
+                            {filteredGames.filter(g => g.status === 'ao_vivo').length}
+                          </p>
+                          <p className="text-sm text-gray-400">Ao Vivo</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-gray-400">
+                            {filteredGames.filter(g => g.status === 'finalizado').length}
+                          </p>
+                          <p className="text-sm text-gray-400">Finalizados</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+            {currentView === 'standings' && <StandingsView selectedCampeonato="todos" />}
+            {currentView === 'campeonatos' && (
+              <CampeonatosView 
+                onCampeonatoSelect={() => {}}
+                onViewChange={() => {}}
+              />
             )}
           </div>
-        )}
-        {currentView === 'standings' && <StandingsView selectedCampeonato="todos" />}
-        {currentView === 'campeonatos' && (
-          <CampeonatosView 
-            onCampeonatoSelect={() => {}}
-            onViewChange={() => {}}
-          />
-        )}
-      </div>
 
-      {showAdminPanel && (
-        <>
-          {!isAuthenticated ? (
-            <AdminLogin 
-              onLogin={handleAdminLogin}
-              onClose={() => setShowAdminPanel(false)}
-            />
-          ) : (
-            <AdminPanel 
-              onDataUpdate={handleRefresh}
-              isLoading={isLoading}
-            />
+          {showAdminPanel && (
+            <>
+              {!isAuthenticated ? (
+                <AdminLogin 
+                  onLogin={handleAdminLogin}
+                  onClose={() => setShowAdminPanel(false)}
+                />
+              ) : (
+                <AdminPanel 
+                  onDataUpdate={handleRefresh}
+                  isLoading={isLoading}
+                />
+              )}
+            </>
           )}
-        </>
-      )}
-    </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 
 export default Index;
-

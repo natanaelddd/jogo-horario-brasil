@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Game } from '@/types/game';
-import { Calendar, Clock, MapPin, Tv, Trophy } from 'lucide-react';
+import { Calendar, Clock, MapPin, Tv, Trophy, Play, CheckCircle, Clock3 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import TeamFlag from './TeamFlag';
@@ -32,23 +32,23 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
     switch (status) {
       case 'ao_vivo': 
         return (
-          <Badge className="bg-red-600 text-white border-red-500 animate-pulse">
-            <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-            AO VIVO
+          <Badge className="bg-red-600 text-white border-red-500 hover:bg-red-700 transition-colors">
+            <Play className="w-3 h-3 mr-1 fill-current" />
+            <span className="font-semibold">AO VIVO</span>
           </Badge>
         );
       case 'finalizado': 
         return (
-          <Badge className="bg-green-600 text-white border-green-500">
-            <Trophy className="w-3 h-3 mr-1" />
-            FINALIZADO
+          <Badge className="bg-green-600 text-white border-green-500 hover:bg-green-700 transition-colors">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            <span className="font-semibold">ENCERRADO</span>
           </Badge>
         );
       default: 
         return (
-          <Badge className="bg-blue-600 text-white border-blue-500">
-            <Clock className="w-3 h-3 mr-1" />
-            AGENDADO
+          <Badge className="bg-blue-600 text-white border-blue-500 hover:bg-blue-700 transition-colors">
+            <Clock3 className="w-3 h-3 mr-1" />
+            <span className="font-semibold">AGENDADO</span>
           </Badge>
         );
     }
@@ -74,7 +74,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
         <div className="text-white font-bold text-sm mb-1">
           {formatDate(game.data)}
         </div>
-        <Badge className={`${getCampeonatoColor(game.campeonato)} text-white text-xs`}>
+        <Badge className={`${getCampeonatoColor(game.campeonato)} text-white text-xs font-medium`}>
           {game.fase || 'Partida'}
         </Badge>
       </div>
@@ -84,14 +84,14 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
         <div className="grid grid-cols-3 gap-4 items-center mb-4">
           {/* Time Casa */}
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-2 bg-gray-700 rounded-full flex items-center justify-center border-2 border-purple-500/50 group-hover:border-purple-500 transition-colors overflow-hidden">
-              <TeamFlag teamName={game.time_casa} size={48} />
+            <div className="w-16 h-16 mx-auto mb-2 bg-gray-700/50 rounded-full flex items-center justify-center border-2 border-purple-500/30 group-hover:border-purple-500/60 transition-all duration-300 overflow-hidden">
+              <TeamFlag teamName={game.time_casa} size={40} />
             </div>
             <div className="text-white text-sm font-semibold truncate">
               {game.time_casa}
             </div>
             {game.placar_casa !== null && (
-              <div className="text-green-400 font-bold text-xl mt-1">
+              <div className="text-green-400 font-bold text-2xl mt-1">
                 {game.placar_casa}
               </div>
             )}
@@ -99,25 +99,23 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
           {/* VS e Horário */}
           <div className="text-center">
-            <div className="text-gray-400 text-xs mb-1">VS</div>
-            <div className="text-white font-bold text-lg">
+            <div className="text-gray-400 text-xs mb-1 font-medium">VS</div>
+            <div className="text-white font-bold text-lg mb-2">
               {game.hora}
             </div>
-            <div className="mt-2">
-              {getStatusBadge(game.status)}
-            </div>
+            {getStatusBadge(game.status)}
           </div>
 
           {/* Time Fora */}
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-2 bg-gray-700 rounded-full flex items-center justify-center border-2 border-blue-500/50 group-hover:border-blue-500 transition-colors overflow-hidden">
-              <TeamFlag teamName={game.time_fora} size={48} />
+            <div className="w-16 h-16 mx-auto mb-2 bg-gray-700/50 rounded-full flex items-center justify-center border-2 border-blue-500/30 group-hover:border-blue-500/60 transition-all duration-300 overflow-hidden">
+              <TeamFlag teamName={game.time_fora} size={40} />
             </div>
             <div className="text-white text-sm font-semibold truncate">
               {game.time_fora}
             </div>
             {game.placar_fora !== null && (
-              <div className="text-green-400 font-bold text-xl mt-1">
+              <div className="text-green-400 font-bold text-2xl mt-1">
                 {game.placar_fora}
               </div>
             )}
