@@ -67,14 +67,40 @@ const Index = () => {
 
   // Filtrar jogos apenas do mês de maio (2025-05) para a home
   const filterMayGames = (games: Game[]): Game[] => {
-    return games.filter(game => {
+    console.log('Todos os jogos recebidos:', games.length);
+    
+    const mayGames = games.filter(game => {
+      // Tratamento mais robusto da data
       const gameDate = new Date(game.data);
+      console.log('Data do jogo:', game.data, 'Parsed:', gameDate);
+      
+      // Verificar se a data é válida
+      if (isNaN(gameDate.getTime())) {
+        console.log('Data inválida para jogo:', game);
+        return false;
+      }
+      
       const gameYear = gameDate.getFullYear();
       const gameMonth = gameDate.getMonth() + 1; // getMonth() retorna 0-11
       
-      // Apenas jogos de maio de 2025
-      return gameYear === 2025 && gameMonth === 5;
+      console.log(`Jogo: ${game.time_casa} vs ${game.time_fora}, Data: ${game.data}, Ano: ${gameYear}, Mês: ${gameMonth}, Campeonato: ${game.campeonato}`);
+      
+      // Filtrar por maio de 2025
+      const isMay2025 = gameYear === 2025 && gameMonth === 5;
+      
+      if (isMay2025) {
+        console.log('✅ Jogo de maio encontrado:', game.time_casa, 'vs', game.time_fora);
+      }
+      
+      return isMay2025;
     });
+    
+    console.log('Jogos de maio filtrados:', mayGames.length);
+    mayGames.forEach(game => {
+      console.log(`- ${game.time_casa} vs ${game.time_fora} (${game.campeonato}) - ${game.data}`);
+    });
+    
+    return mayGames;
   };
 
   // Para a view de games (home), filtrar apenas jogos de maio
@@ -82,7 +108,12 @@ const Index = () => {
   
   // Aplicar filtro de campeonato apenas se não for 'todos'
   if (selectedCampeonato !== 'todos') {
-    filteredGames = filteredGames.filter(game => game.campeonato === selectedCampeonato);
+    console.log('Aplicando filtro de campeonato:', selectedCampeonato);
+    filteredGames = filteredGames.filter(game => {
+      console.log(`Verificando jogo ${game.time_casa} vs ${game.time_fora}: campeonato=${game.campeonato}, selecionado=${selectedCampeonato}`);
+      return game.campeonato === selectedCampeonato;
+    });
+    console.log('Jogos após filtro de campeonato:', filteredGames.length);
   }
 
   // Encontrar o próximo jogo mais relevante para o Hero Section
@@ -137,6 +168,18 @@ const Index = () => {
                   selectedCampeonato={selectedCampeonato}
                   onCampeonatoChange={setSelectedCampeonato}
                 />
+
+                {/* Debug Info */}
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <CardContent>
+                    <p className="text-white text-sm">
+                      Debug: Total de jogos carregados: {games.length} | 
+                      Jogos de maio filtrados: {currentView === 'games' ? filterMayGames(games).length : 'N/A'} | 
+                      Filtro atual: {selectedCampeonato} | 
+                      Jogos exibidos: {filteredGames.length}
+                    </p>
+                  </CardContent>
+                </Card>
 
                 {/* Lista de Jogos */}
                 <div className="space-y-4">
