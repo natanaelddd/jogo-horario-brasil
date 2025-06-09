@@ -11,14 +11,10 @@ import AdminLogin from '@/components/AdminLogin';
 import ViewSelector from '@/components/ViewSelector';
 import StandingsView from '@/components/StandingsView';
 import CampeonatosView from '@/components/CampeonatosView';
-import CampeonatoFilter from '@/components/CampeonatoFilter';
-import HeroGameSection from '@/components/HeroGameSection';
-import GameCard from '@/components/GameCard';
+import GamesSection from '@/components/GamesSection';
 import { GameDataService } from '@/services/gameDataService';
 import { AuthService } from '@/services/authService';
-import { CampeonatoType, Game } from '@/types/game';
-import { Card, CardContent } from '@/components/ui/card';
-import { RefreshCw, Trophy } from 'lucide-react';
+import { CampeonatoType } from '@/types/game';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'games' | 'standings' | 'campeonatos'>('games');
@@ -65,80 +61,6 @@ const Index = () => {
     setCurrentView(viewMap[view]);
   };
 
-  // Filtrar jogos apenas do mês de maio (2025-05) para a home
-  const filterMayGames = (games: Game[]): Game[] => {
-    console.log('Todos os jogos recebidos:', games.length);
-    
-    const mayGames = games.filter(game => {
-      // Tratamento mais robusto da data
-      const gameDate = new Date(game.data);
-      console.log('Data do jogo:', game.data, 'Parsed:', gameDate);
-      
-      // Verificar se a data é válida
-      if (isNaN(gameDate.getTime())) {
-        console.log('Data inválida para jogo:', game);
-        return false;
-      }
-      
-      const gameYear = gameDate.getFullYear();
-      const gameMonth = gameDate.getMonth() + 1; // getMonth() retorna 0-11
-      
-      console.log(`Jogo: ${game.time_casa} vs ${game.time_fora}, Data: ${game.data}, Ano: ${gameYear}, Mês: ${gameMonth}, Campeonato: ${game.campeonato}`);
-      
-      // Filtrar por maio de 2025
-      const isMay2025 = gameYear === 2025 && gameMonth === 5;
-      
-      if (isMay2025) {
-        console.log('✅ Jogo de maio encontrado:', game.time_casa, 'vs', game.time_fora);
-      }
-      
-      return isMay2025;
-    });
-    
-    console.log('Jogos de maio filtrados:', mayGames.length);
-    mayGames.forEach(game => {
-      console.log(`- ${game.time_casa} vs ${game.time_fora} (${game.campeonato}) - ${game.data}`);
-    });
-    
-    return mayGames;
-  };
-
-  // Para a view de games (home), filtrar apenas jogos de maio
-  let filteredGames = currentView === 'games' ? filterMayGames(games) : games;
-  
-  // Aplicar filtro de campeonato apenas se não for 'todos'
-  if (selectedCampeonato !== 'todos') {
-    console.log('Aplicando filtro de campeonato:', selectedCampeonato);
-    filteredGames = filteredGames.filter(game => {
-      console.log(`Verificando jogo ${game.time_casa} vs ${game.time_fora}: campeonato=${game.campeonato}, selecionado=${selectedCampeonato}`);
-      return game.campeonato === selectedCampeonato;
-    });
-    console.log('Jogos após filtro de campeonato:', filteredGames.length);
-  }
-
-  // Encontrar o próximo jogo mais relevante para o Hero Section
-  const getHeroGame = (games: Game[]): Game | null => {
-    if (games.length === 0) return null;
-    
-    // Priorizar jogos ao vivo
-    const liveGames = games.filter(game => game.status === 'ao_vivo');
-    if (liveGames.length > 0) return liveGames[0];
-    
-    // Depois jogos agendados da seleção brasileira
-    const brasilGames = games.filter(game => 
-      game.status === 'agendado' && 
-      (game.time_casa.toLowerCase().includes('brasil') || game.time_fora.toLowerCase().includes('brasil'))
-    );
-    if (brasilGames.length > 0) return brasilGames[0];
-    
-    // Por último, qualquer jogo agendado
-    const scheduledGames = games.filter(game => game.status === 'agendado');
-    return scheduledGames.length > 0 ? scheduledGames[0] : games[0];
-  };
-
-  const heroGame = getHeroGame(filteredGames);
-  const remainingGames = filteredGames.filter(game => game.id !== heroGame?.id);
-
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-900">
@@ -159,94 +81,12 @@ const Index = () => {
             />
             
             {currentView === 'games' && (
-              <div className="space-y-6">
-                {/* Hero Game Section */}
-                <HeroGameSection game={heroGame} />
-
-                {/* Filtros por Campeonato */}
-                <CampeonatoFilter 
-                  selectedCampeonato={selectedCampeonato}
-                  onCampeonatoChange={setSelectedCampeonato}
-                />
-
-                {/* Debug Info */}
-                <Card className="bg-gray-800 border-gray-700 p-4">
-                  <CardContent>
-                    <p className="text-white text-sm">
-                      Debug: Total de jogos carregados: {games.length} | 
-                      Jogos de maio filtrados: {currentView === 'games' ? filterMayGames(games).length : 'N/A'} | 
-                      Filtro atual: {selectedCampeonato} | 
-                      Jogos exibidos: {filteredGames.length}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Lista de Jogos */}
-                <div className="space-y-4">
-                  {isLoading ? (
-                    <div className="text-center py-8">
-                      <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-400" />
-                      <p className="text-lg text-white">Carregando jogos...</p>
-                      <p className="text-sm text-gray-400 mt-2">
-                        Conectando com o banco de dados...
-                      </p>
-                    </div>
-                  ) : remainingGames.length === 0 ? (
-                    <Card className="bg-gray-800 border-gray-700 text-center py-8">
-                      <CardContent>
-                        <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-                        <h3 className="text-lg font-semibold mb-2 text-white">Nenhum jogo de maio encontrado</h3>
-                        <p className="text-gray-400">
-                          {selectedCampeonato === 'todos' 
-                            ? 'Não há jogos de maio agendados no momento.' 
-                            : `Não há jogos de maio agendados para este campeonato.`
-                          }
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                      {remainingGames.map((game) => (
-                        <GameCard key={game.id} game={game} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Estatísticas */}
-                {filteredGames.length > 0 && (
-                  <Card className="bg-gray-800 border-gray-700 mt-8">
-                    <CardContent className="pt-6">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                        <div>
-                          <p className="text-2xl font-bold text-purple-400">
-                            {filteredGames.length}
-                          </p>
-                          <p className="text-sm text-gray-400">Jogos de Maio</p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-green-400">
-                            {filteredGames.filter(g => g.status === 'agendado').length}
-                          </p>
-                          <p className="text-sm text-gray-400">Agendados</p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-red-400">
-                            {filteredGames.filter(g => g.status === 'ao_vivo').length}
-                          </p>
-                          <p className="text-sm text-gray-400">Ao Vivo</p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-gray-400">
-                            {filteredGames.filter(g => g.status === 'finalizado').length}
-                          </p>
-                          <p className="text-sm text-gray-400">Finalizados</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+              <GamesSection
+                games={games}
+                isLoading={isLoading}
+                selectedCampeonato={selectedCampeonato}
+                onCampeonatoChange={setSelectedCampeonato}
+              />
             )}
             
             {currentView === 'standings' && (
