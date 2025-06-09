@@ -10,6 +10,7 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
   const getTeamShieldUrl = (name: string) => {
     // URLs dos escudos dos times brasileiros - usando CDN mais confiável
     const teamShields: { [key: string]: string } = {
+      // Times brasileiros
       'Flamengo': 'https://logoeps.com/wp-content/uploads/2013/03/flamengo-vector-logo.png',
       'Palmeiras': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Palmeiras_logo.svg/200px-Palmeiras_logo.svg.png',
       'Corinthians': 'https://logoeps.com/wp-content/uploads/2013/03/corinthians-vector-logo.png',
@@ -33,7 +34,19 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
       'Juventude': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Juventude_logo.svg/200px-Juventude_logo.svg.png',
       'Cuiabá': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Cuiab%C3%A1_Esporte_Clube_logo.svg/200px-Cuiab%C3%A1_Esporte_Clube_logo.svg.png',
       'Atlético-GO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Atletico_Goianiense_logo.svg/200px-Atletico_Goianiense_logo.svg.png',
-      'Chapecoense': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Chapecoense_logo.svg/200px-Chapecoense_logo.svg.png'
+      'Chapecoense': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Chapecoense_logo.svg/200px-Chapecoense_logo.svg.png',
+      
+      // Seleções das Eliminatórias
+      'Brasil': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/200px-Flag_of_Brazil.svg.png',
+      'Argentina': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/200px-Flag_of_Argentina.svg.png',
+      'Uruguai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_Uruguay.svg/200px-Flag_of_Uruguay.svg.png',
+      'Colômbia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/200px-Flag_of_Colombia.svg.png',
+      'Chile': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Flag_of_Chile.svg/200px-Flag_of_Chile.svg.png',
+      'Peru': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Peru.svg/200px-Flag_of_Peru.svg.png',
+      'Equador': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Flag_of_Ecuador.svg/200px-Flag_of_Ecuador.svg.png',
+      'Paraguai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Paraguay.svg/200px-Flag_of_Paraguay.svg.png',
+      'Bolívia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Bolivia.svg/200px-Flag_of_Bolivia.svg.png',
+      'Venezuela': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Flag_of_Venezuela.svg/200px-Flag_of_Venezuela.svg.png'
     };
     
     return teamShields[name];
