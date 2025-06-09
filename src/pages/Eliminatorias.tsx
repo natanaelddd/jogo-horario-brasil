@@ -1,8 +1,10 @@
 
-import Navigation from '@/components/Navigation';
-import EliminatoriasSulAmericanas from '@/components/EliminatoriasSulAmericanas';
 import { useState } from 'react';
 import { toast } from "sonner";
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import AppSidebar from '@/components/AppSidebar';
+import Navigation from '@/components/Navigation';
+import EliminatoriasSulAmericanas from '@/components/EliminatoriasSulAmericanas';
 import AdminPanel from '@/components/AdminPanel';
 import AdminLogin from '@/components/AdminLogin';
 import { AuthService } from '@/services/authService';
@@ -43,31 +45,36 @@ const Eliminatorias = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation 
-        onRefresh={handleRefresh}
-        onShowAdmin={() => setShowAdminPanel(true)}
-        isLoading={false}
-      />
-      
-      <EliminatoriasSulAmericanas />
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gray-900">
+        <AppSidebar />
+        <SidebarInset className="flex-1">
+          <Navigation 
+            onRefresh={handleRefresh}
+            onShowAdmin={() => setShowAdminPanel(true)}
+            isLoading={false}
+          />
+          
+          <EliminatoriasSulAmericanas />
 
-      {showAdminPanel && (
-        <>
-          {!isAuthenticated ? (
-            <AdminLogin 
-              onLogin={handleAdminLogin}
-              onClose={() => setShowAdminPanel(false)}
-            />
-          ) : (
-            <AdminPanel 
-              onDataUpdate={handleRefresh}
-              isLoading={false}
-            />
+          {showAdminPanel && (
+            <>
+              {!isAuthenticated ? (
+                <AdminLogin 
+                  onLogin={handleAdminLogin}
+                  onClose={() => setShowAdminPanel(false)}
+                />
+              ) : (
+                <AdminPanel 
+                  onDataUpdate={handleRefresh}
+                  isLoading={false}
+                />
+              )}
+            </>
           )}
-        </>
-      )}
-    </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 
