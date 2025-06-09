@@ -1,10 +1,11 @@
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Calendar, Clock, MapPin, Trophy } from 'lucide-react';
+import { CampeonatoType, Game } from '@/types/game';
 import { GameDataService } from '@/services/gameDataService';
-import { Game, CampeonatoType } from '@/types/game';
 import { CAMPEONATOS } from '@/config/campeonatos';
 
 interface GameHistoryProps {
@@ -14,12 +15,12 @@ interface GameHistoryProps {
 
 const GameHistory = ({ campeonato, limit = 10 }: GameHistoryProps) => {
   const { data: games = [], isLoading } = useQuery({
-    queryKey: ['game-history', campeonato],
+    queryKey: ['game-history', campeonato, limit],
     queryFn: async () => {
       const gameService = GameDataService.getInstance();
       const allGames = await gameService.fetchGamesByCampeonato(campeonato);
       
-      // Filtrar jogos finalizados e ordenar por data mais recente
+      // Filtrar apenas jogos finalizados e ordenar por data (mais recentes primeiro)
       const finishedGames = allGames
         .filter(game => game.status === 'finalizado')
         .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
@@ -35,16 +36,32 @@ const GameHistory = ({ campeonato, limit = 10 }: GameHistoryProps) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('pt-BR', { 
       day: '2-digit', 
-      month: '2-digit',
-      year: '2-digit'
-    });
+      month: 'short',
+      year: 'numeric'
+    }).toUpperCase();
+  };
+
+  const getResultColor = (placarCasa: number | null, placarFora: number | null) => {
+    if (placarCasa === null || placarFora === null) return 'bg-gray-500';
+    if (placarCasa > placarFora) return 'bg-green-600';
+    if (placarCasa < placarFora) return 'bg-red-600';
+    return 'bg-yellow-600';
   };
 
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <p className="text-center">Carregando histórico...</p>
+        <CardHeader>
+          <CardTitle>Últimos Resultados</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-16 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     );
@@ -53,10 +70,16 @@ const GameHistory = ({ campeonato, limit = 10 }: GameHistoryProps) => {
   if (games.length === 0) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <p className="text-center text-muted-foreground">
-            Nenhum jogo finalizado encontrado
-          </p>
+        <CardHeader>
+          <CardTitle>Últimos Resultados</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">
+              Nenhum resultado disponível para {CAMPEONATOS[campeonato]?.nome}
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -65,50 +88,53 @@ const GameHistory = ({ campeonato, limit = 10 }: GameHistoryProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          Últimos Resultados - {CAMPEONATOS[campeonato]?.nome}
+        <CardTitle className="flex items-center gap-2">
+          <Trophy className="w-5 h-5" />
+          Últimos Resultados
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {games.map((game) => (
-            <div key={game.id} className="p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
+            <div key={game.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="w-4 h-4" />
+                  {formatDate(game.data)}
+                  <Clock className="w-4 h-4 ml-2" />
+                  {game.hora}
+                </div>
+                {game.fase && (
                   <Badge variant="outline" className="text-xs">
-                    {game.rodada ? `${game.rodada}ª Rodada` : game.fase}
+                    {game.fase}
                   </Badge>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
-                    <span>{formatDate(game.data)}</span>
-                  </div>
-                </div>
-                <Badge variant="secondary" className="text-xs">
-                  Finalizado
-                </Badge>
+                )}
               </div>
-              
+
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="text-right flex-1">
-                    <p className="font-semibold text-sm">{game.time_casa}</p>
-                  </div>
-                  
-                  <div className="px-3 py-1 bg-muted rounded-lg">
-                    <span className="font-bold text-lg">
-                      {game.placar_casa ?? 0} - {game.placar_fora ?? 0}
-                    </span>
-                  </div>
-                  
-                  <div className="text-left flex-1">
-                    <p className="font-semibold text-sm">{game.time_fora}</p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">{game.time_casa}</span>
+                    <Badge className={`${getResultColor(game.placar_casa, game.placar_fora)} text-white px-3 py-1`}>
+                      {game.placar_casa !== null && game.placar_fora !== null 
+                        ? `${game.placar_casa} - ${game.placar_fora}`
+                        : 'N/A'
+                      }
+                    </Badge>
+                    <span className="font-medium">{game.time_fora}</span>
                   </div>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
+
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
                 <MapPin className="w-3 h-3" />
-                <span className="truncate">{game.estadio}</span>
+                <span>{game.estadio}</span>
+                {game.transmissao && game.transmissao.length > 0 && (
+                  <>
+                    <span>•</span>
+                    <span>{game.transmissao.join(', ')}</span>
+                  </>
+                )}
               </div>
             </div>
           ))}

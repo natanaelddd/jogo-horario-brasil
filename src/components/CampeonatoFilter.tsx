@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Globe, Flag, Crown, Award, Star, Zap } from 'lucide-react';
@@ -21,6 +22,7 @@ const CampeonatoFilter = ({ selectedCampeonato, onCampeonatoChange }: Campeonato
       case 'brasileiro-b': return 'data-[state=active]:bg-blue-600 data-[state=active]:text-white';
       case 'copa-do-brasil': return 'data-[state=active]:bg-purple-600 data-[state=active]:text-white';
       case 'libertadores': return 'data-[state=active]:bg-red-600 data-[state=active]:text-white';
+      case 'mundial-clubes': return 'data-[state=active]:bg-purple-700 data-[state=active]:text-white';
       case 'eliminatorias-copa': return 'data-[state=active]:bg-green-600 data-[state=active]:text-white';
       case 'amistosos-selecao': return 'data-[state=active]:bg-blue-600 data-[state=active]:text-white';
       default: return 'data-[state=active]:bg-purple-600 data-[state=active]:text-white';
@@ -36,7 +38,7 @@ const CampeonatoFilter = ({ selectedCampeonato, onCampeonatoChange }: Campeonato
       </CardHeader>
       <CardContent>
         <Tabs value={selectedCampeonato} onValueChange={(value) => onCampeonatoChange(value as CampeonatoType | 'todos')}>
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 h-auto p-2 bg-gray-900">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 h-auto p-2 bg-gray-900">
             <TabsTrigger 
               value="todos" 
               className="flex items-center gap-2 p-3 text-gray-300 hover:text-white data-[state=active]:bg-purple-600 data-[state=active]:text-white transition-all"
@@ -67,4 +69,3 @@ const CampeonatoFilter = ({ selectedCampeonato, onCampeonatoChange }: Campeonato
 };
 
 export default CampeonatoFilter;
-

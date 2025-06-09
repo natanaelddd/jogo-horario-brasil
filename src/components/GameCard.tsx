@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Game } from '@/types/game';
 import { Calendar, Clock, MapPin, Tv, Trophy } from 'lucide-react';
@@ -40,6 +41,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
       case 'brasileiro-b': return 'bg-blue-600';
       case 'copa-do-brasil': return 'bg-purple-600';
       case 'libertadores': return 'bg-red-600';
+      case 'mundial-clubes': return 'bg-purple-700';
       case 'eliminatorias-copa': return 'bg-green-600';
       case 'amistosos-selecao': return 'bg-blue-600';
       default: return 'bg-gray-600';
@@ -142,4 +144,3 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 };
 
 export default GameCard;
-
