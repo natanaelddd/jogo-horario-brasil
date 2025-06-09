@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StandingsService, Standing } from '@/services/standingsService';
 import { CAMPEONATOS } from '@/config/campeonatos';
 import { CampeonatoType } from '@/types/game';
+import TeamFlag from './TeamFlag';
 
 interface StandingsTableProps {
   campeonato: CampeonatoType;
@@ -30,6 +31,10 @@ const StandingsTable = ({ campeonato }: StandingsTableProps) => {
       if (posicao <= 12) return 'bg-green-500'; // Sul-americana
       if (posicao >= 17) return 'bg-red-500'; // Rebaixamento
     }
+    if (campeonato === 'brasileiro-b') {
+      if (posicao <= 4) return 'bg-green-500'; // Acesso
+      if (posicao >= 17) return 'bg-red-500'; // Rebaixamento
+    }
     return 'bg-gray-400';
   };
 
@@ -38,6 +43,10 @@ const StandingsTable = ({ campeonato }: StandingsTableProps) => {
       if (posicao <= 4) return 'Libertadores';
       if (posicao <= 6) return 'Pré-Libertadores';
       if (posicao <= 12) return 'Sul-Americana';
+      if (posicao >= 17) return 'Rebaixamento';
+    }
+    if (campeonato === 'brasileiro-b') {
+      if (posicao <= 4) return 'Acesso à Série A';
       if (posicao >= 17) return 'Rebaixamento';
     }
     return '';
@@ -56,9 +65,18 @@ const StandingsTable = ({ campeonato }: StandingsTableProps) => {
   if (error || standings.length === 0) {
     return (
       <Card className="uefa-table">
+        <CardHeader className="uefa-table-header">
+          <CardTitle className="flex items-center gap-2 text-white">
+            Classificação - {CAMPEONATOS[campeonato]?.nome}
+            <Badge variant="outline" className="border-white/30 text-white">2025</Badge>
+          </CardTitle>
+        </CardHeader>
         <CardContent className="p-6">
           <p className="text-center text-muted-foreground">
-            Classificação não disponível para este campeonato
+            {error ? 'Erro ao carregar classificação' : 'Classificação ainda não disponível para este campeonato'}
+          </p>
+          <p className="text-center text-sm text-muted-foreground mt-2">
+            Os dados serão carregados conforme os jogos forem sendo realizados
           </p>
         </CardContent>
       </Card>
@@ -70,7 +88,7 @@ const StandingsTable = ({ campeonato }: StandingsTableProps) => {
       <CardHeader className="uefa-table-header">
         <CardTitle className="flex items-center gap-2 text-white">
           Classificação - {CAMPEONATOS[campeonato]?.nome}
-          <Badge variant="outline" className="border-white/30 text-white">2024</Badge>
+          <Badge variant="outline" className="border-white/30 text-white">2025</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -106,17 +124,7 @@ const StandingsTable = ({ campeonato }: StandingsTableProps) => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
-                        <img 
-                          src={standing.team.escudo_url || 'https://via.placeholder.com/24x24/e5e7eb/6b7280?text=' + encodeURIComponent(standing.team.sigla)}
-                          alt={`Escudo ${standing.team.nome}`}
-                          className="w-5 h-5 object-contain"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = 'https://via.placeholder.com/20x20/e5e7eb/6b7280?text=' + encodeURIComponent(standing.team.sigla);
-                          }}
-                        />
-                      </div>
+                      <TeamFlag teamName={standing.team.nome} size={24} />
                       <div>
                         <p className="font-medium text-sm text-foreground">{standing.team.nome}</p>
                         <p className="text-xs text-muted-foreground">{standing.team.sigla}</p>
@@ -158,25 +166,41 @@ const StandingsTable = ({ campeonato }: StandingsTableProps) => {
         </div>
         
         {/* Legenda */}
-        {campeonato === 'brasileiro-a' && (
+        {(campeonato === 'brasileiro-a' || campeonato === 'brasileiro-b') && (
           <div className="p-4 border-t border-uefa">
             <div className="flex flex-wrap gap-4 text-xs">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                <span className="text-muted-foreground">Libertadores</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-orange-500 rounded"></div>
-                <span className="text-muted-foreground">Pré-Libertadores</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-green-500 rounded"></div>
-                <span className="text-muted-foreground">Sul-Americana</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-red-500 rounded"></div>
-                <span className="text-muted-foreground">Rebaixamento</span>
-              </div>
+              {campeonato === 'brasileiro-a' && (
+                <>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                    <span className="text-muted-foreground">Libertadores</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                    <span className="text-muted-foreground">Pré-Libertadores</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-green-500 rounded"></div>
+                    <span className="text-muted-foreground">Sul-Americana</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-red-500 rounded"></div>
+                    <span className="text-muted-foreground">Rebaixamento</span>
+                  </div>
+                </>
+              )}
+              {campeonato === 'brasileiro-b' && (
+                <>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-green-500 rounded"></div>
+                    <span className="text-muted-foreground">Acesso à Série A</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-red-500 rounded"></div>
+                    <span className="text-muted-foreground">Rebaixamento</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

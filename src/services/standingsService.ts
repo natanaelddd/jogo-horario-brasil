@@ -45,11 +45,17 @@ export class StandingsService {
           team:teams(nome, nome_completo, sigla, escudo_url)
         `)
         .eq('campeonato', campeonato)
+        .eq('temporada', '2025')
         .order('posicao', { ascending: true });
 
       if (error) {
         console.error('Erro ao buscar classificação:', error);
         throw new Error(`Erro ao buscar classificação: ${error.message}`);
+      }
+
+      if (!data || data.length === 0) {
+        console.log(`Nenhuma classificação encontrada para o campeonato: ${campeonato}`);
+        return [];
       }
 
       return data.map(item => ({
@@ -67,11 +73,16 @@ export class StandingsService {
         saldo_gols: item.saldo_gols,
         aproveitamento: item.aproveitamento,
         ultimos_jogos: item.ultimos_jogos || [],
-        team: item.team
+        team: item.team || {
+          nome: 'Time não encontrado',
+          nome_completo: 'Time não encontrado',
+          sigla: 'N/A',
+          escudo_url: ''
+        }
       }));
     } catch (error) {
       console.error('Erro na busca de classificação:', error);
-      throw error;
+      return [];
     }
   }
 }

@@ -2,7 +2,6 @@
 import { Game, FetchLog, DataSource, CampeonatoType } from '@/types/game';
 import { CAMPEONATOS } from '@/config/campeonatos';
 import { SupabaseGameService } from './supabaseGameService';
-import { EXAMPLE_GAMES, getExampleGamesByCampeonato, getAllExampleGames } from '@/data/exampleGames';
 
 export class GameDataService {
   private static instance: GameDataService;
@@ -25,53 +24,33 @@ export class GameDataService {
     try {
       const games = await this.supabaseService.fetchGamesByCampeonato(campeonato);
       
-      // Se não encontrou jogos no Supabase, usa dados de exemplo
-      if (games.length === 0) {
-        console.log('Nenhum jogo encontrado no Supabase, usando dados de exemplo');
-        const exampleGames = getExampleGamesByCampeonato(campeonato);
-        
-        // Log do fallback
-        await this.supabaseService.logFetch({
-          timestamp: new Date().toISOString(),
-          status: 'partial',
-          source: 'Example Data (Fallback)',
-          campeonato,
-          gamesFound: exampleGames.length,
-          message: `Usando dados de exemplo para ${CAMPEONATOS[campeonato].nome} - Supabase retornou 0 jogos`
-        });
-        
-        return exampleGames;
-      }
-      
-      // Log da busca bem-sucedida
+      // Log da busca
       await this.supabaseService.logFetch({
         timestamp: new Date().toISOString(),
-        status: 'success',
+        status: games.length > 0 ? 'success' : 'partial',
         source: 'Supabase Database',
         campeonato,
         gamesFound: games.length,
-        message: `Dados obtidos com sucesso do Supabase para ${CAMPEONATOS[campeonato].nome}`
+        message: games.length > 0 
+          ? `Dados obtidos com sucesso do Supabase para ${CAMPEONATOS[campeonato].nome}`
+          : `Nenhum jogo encontrado no Supabase para ${CAMPEONATOS[campeonato].nome}`
       });
       
       return games;
     } catch (error) {
       console.error('Erro ao buscar dados do Supabase:', error);
       
-      // Em caso de erro, usa dados de exemplo
-      console.log('Erro na conexão com Supabase, usando dados de exemplo');
-      const exampleGames = getExampleGamesByCampeonato(campeonato);
-      
-      // Log do erro e fallback
+      // Log do erro
       await this.supabaseService.logFetch({
         timestamp: new Date().toISOString(),
         status: 'error',
-        source: 'Example Data (Error Fallback)',
+        source: 'Supabase Database',
         campeonato,
-        gamesFound: exampleGames.length,
-        message: `Erro ao buscar dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}. Usando dados de exemplo.`
+        gamesFound: 0,
+        message: `Erro ao buscar dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
       });
       
-      return exampleGames;
+      return [];
     }
   }
 
@@ -81,53 +60,33 @@ export class GameDataService {
     try {
       const games = await this.supabaseService.fetchAllGames();
       
-      // Se não encontrou jogos no Supabase, usa dados de exemplo
-      if (games.length === 0) {
-        console.log('Nenhum jogo encontrado no Supabase, usando dados de exemplo');
-        const exampleGames = getAllExampleGames();
-        
-        // Log do fallback
-        await this.supabaseService.logFetch({
-          timestamp: new Date().toISOString(),
-          status: 'partial',
-          source: 'Example Data (Fallback)',
-          campeonato: 'brasileiro-a', // campeonato padrão para logs gerais
-          gamesFound: exampleGames.length,
-          message: `Usando dados de exemplo - Supabase retornou 0 jogos`
-        });
-        
-        return exampleGames;
-      }
-      
-      // Log da busca bem-sucedida
+      // Log da busca
       await this.supabaseService.logFetch({
         timestamp: new Date().toISOString(),
-        status: 'success',
+        status: games.length > 0 ? 'success' : 'partial',
         source: 'Supabase Database',
         campeonato: 'brasileiro-a', // campeonato padrão para logs gerais
         gamesFound: games.length,
-        message: `Todos os jogos obtidos com sucesso do Supabase`
+        message: games.length > 0 
+          ? `Todos os jogos obtidos com sucesso do Supabase`
+          : `Nenhum jogo encontrado no Supabase`
       });
       
       return games;
     } catch (error) {
       console.error('Erro ao buscar todos os jogos:', error);
       
-      // Em caso de erro, usa dados de exemplo
-      console.log('Erro na conexão com Supabase, usando dados de exemplo');
-      const exampleGames = getAllExampleGames();
-      
-      // Log do erro e fallback
+      // Log do erro
       await this.supabaseService.logFetch({
         timestamp: new Date().toISOString(),
         status: 'error',
-        source: 'Example Data (Error Fallback)',
+        source: 'Supabase Database',
         campeonato: 'brasileiro-a',
-        gamesFound: exampleGames.length,
-        message: `Erro ao buscar todos os jogos: ${error instanceof Error ? error.message : 'Erro desconhecido'}. Usando dados de exemplo.`
+        gamesFound: 0,
+        message: `Erro ao buscar todos os jogos: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
       });
       
-      return exampleGames;
+      return [];
     }
   }
 
