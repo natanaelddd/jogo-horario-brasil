@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 interface TeamFlagProps {
@@ -11,86 +10,91 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const getTeamShieldUrl = (name: string) => {
-    // URLs dos escudos dos times - usando múltiplas fontes mais confiáveis
+    // URLs dos escudos dos times - usando fontes mais confiáveis
     const teamShields: { [key: string]: string } = {
       // Times do Brasileirão Série A
-      'Flamengo': 'https://logoeps.com/wp-content/uploads/2013/03/flamengo-vector-logo.png',
-      'Palmeiras': 'https://logoeps.com/wp-content/uploads/2013/03/palmeiras-vector-logo.png',
-      'Corinthians': 'https://logoeps.com/wp-content/uploads/2013/03/corinthians-vector-logo.png',
-      'São Paulo': 'https://logoeps.com/wp-content/uploads/2013/03/sao-paulo-vector-logo.png',
-      'Santos': 'https://logoeps.com/wp-content/uploads/2013/03/santos-vector-logo.png',
-      'Botafogo': 'https://logoeps.com/wp-content/uploads/2013/03/botafogo-vector-logo.png',
-      'Atlético-MG': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-mineiro-vector-logo.png',
-      'Atlético Mineiro': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-mineiro-vector-logo.png',
-      'Cruzeiro': 'https://logoeps.com/wp-content/uploads/2013/03/cruzeiro-vector-logo.png',
-      'Grêmio': 'https://logoeps.com/wp-content/uploads/2013/03/gremio-vector-logo.png',
-      'Internacional': 'https://logoeps.com/wp-content/uploads/2013/03/internacional-vector-logo.png',
-      'Fluminense': 'https://logoeps.com/wp-content/uploads/2013/03/fluminense-vector-logo.png',
-      'Vasco': 'https://logoeps.com/wp-content/uploads/2013/03/vasco-da-gama-vector-logo.png',
-      'Vasco da Gama': 'https://logoeps.com/wp-content/uploads/2013/03/vasco-da-gama-vector-logo.png',
-      'Athletico-PR': 'https://logos-world.net/wp-content/uploads/2020/06/Athletico-Paranaense-Logo.png',
-      'Athletico Paranaense': 'https://logos-world.net/wp-content/uploads/2020/06/Athletico-Paranaense-Logo.png',
-      'Bahia': 'https://logoeps.com/wp-content/uploads/2013/03/bahia-vector-logo.png',
-      'Fortaleza': 'https://logoeps.com/wp-content/uploads/2014/11/fortaleza-2014-logo-vector.png',
-      'Bragantino': 'https://logos-world.net/wp-content/uploads/2020/12/Red-Bull-Bragantino-Logo.png',
-      'RB Bragantino': 'https://logos-world.net/wp-content/uploads/2020/12/Red-Bull-Bragantino-Logo.png',
-      'Cuiabá': 'https://logoeps.com/wp-content/uploads/2021/03/cuiaba-vector-logo.png',
-      'Atlético-GO': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-goianiense-vector-logo.png',
-      'Atlético Goianiense': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-goianiense-vector-logo.png',
-      'Ceará': 'https://logoeps.com/wp-content/uploads/2013/03/ceara-vector-logo.png',
-      'Coritiba': 'https://logoeps.com/wp-content/uploads/2013/03/coritiba-vector-logo.png',
-      'Vitória': 'https://logoeps.com/wp-content/uploads/2013/03/vitoria-vector-logo.png',
-      'Sport': 'https://logoeps.com/wp-content/uploads/2013/03/sport-recife-vector-logo.png',
-      'Sport Recife': 'https://logoeps.com/wp-content/uploads/2013/03/sport-recife-vector-logo.png',
-      'Chapecoense': 'https://logoeps.com/wp-content/uploads/2013/03/chapecoense-vector-logo.png',
-      'Juventude': 'https://logoeps.com/wp-content/uploads/2013/03/juventude-vector-logo.png',
-      'América-MG': 'https://logoeps.com/wp-content/uploads/2021/05/america-mg-2021-logo-vector.png',
-      'América Mineiro': 'https://logoeps.com/wp-content/uploads/2021/05/america-mg-2021-logo-vector.png',
+      'Flamengo': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Flamengo-RJ_%28BRA%29.png',
+      'Palmeiras': 'https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg',
+      'Corinthians': 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Corinthians_Brasil.png',
+      'São Paulo': 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Sao_Paulo_Futebol_Clube.svg',
+      'Santos': 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Santos_logo.svg',
+      'Botafogo': 'https://upload.wikimedia.org/wikipedia/commons/5/52/Botafogo_de_Futebol_e_Regatas_logo.svg',
+      'Atlético-MG': 'https://upload.wikimedia.org/wikipedia/commons/5/56/Atletico_mineiro_galo.png',
+      'Atlético Mineiro': 'https://upload.wikimedia.org/wikipedia/commons/5/56/Atletico_mineiro_galo.png',
+      'Cruzeiro': 'https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg',
+      'Grêmio': 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Gremio.svg',
+      'Internacional': 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Escudo_do_Sport_Club_Internacional.svg',
+      'Fluminense': 'https://upload.wikimedia.org/wikipedia/commons/a/af/Fluminense_fc_logo.svg',
+      'Vasco': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Vasco_da_Gama_Logo.svg',
+      'Vasco da Gama': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Vasco_da_Gama_Logo.svg',
+      'Athletico-PR': 'https://upload.wikimedia.org/wikipedia/commons/5/56/Club_Athletico_Paranaense_logo.svg',
+      'Athletico Paranaense': 'https://upload.wikimedia.org/wikipedia/commons/5/56/Club_Athletico_Paranaense_logo.svg',
+      'Bahia': 'https://upload.wikimedia.org/wikipedia/commons/1/19/EClubeBahia.svg',
+      'Fortaleza': 'https://upload.wikimedia.org/wikipedia/commons/4/40/FortalezaEsporteClube.svg',
+      'Bragantino': 'https://upload.wikimedia.org/wikipedia/commons/9/9b/Red_Bull_Bragantino_logo.svg',
+      'RB Bragantino': 'https://upload.wikimedia.org/wikipedia/commons/9/9b/Red_Bull_Bragantino_logo.svg',
+      'Cuiabá': 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Cuiaba_Esporte_Clube_logo.svg',
+      'Atlético-GO': 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Atletico_GO.svg',
+      'Atlético Goianiense': 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Atletico_GO.svg',
+      'Ceará': 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Ceara_sporting_club_logo.svg',
+      'Coritiba': 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Coritiba_2011.svg',
+      'Vitória': 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Vit%C3%B3ria_Salvador_BA.svg',
+      'Sport': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Sport_Club_do_Recife_logo.svg',
+      'Sport Recife': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Sport_Club_do_Recife_logo.svg',
+      'Chapecoense': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Chapecoense_logo.svg',
+      'Juventude': 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Juventude.svg',
+      'América-MG': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/America_mineiro_logo.svg',
+      'América Mineiro': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/America_mineiro_logo.svg',
       
       // Times da Série B
-      'Guarani': 'https://logoeps.com/wp-content/uploads/2013/03/guarani-vector-logo.png',
-      'Ponte Preta': 'https://logoeps.com/wp-content/uploads/2013/03/ponte-preta-vector-logo.png',
-      'Avaí': 'https://logoeps.com/wp-content/uploads/2013/03/avai-vector-logo.png',
-      'CRB': 'https://logoeps.com/wp-content/uploads/2013/03/crb-vector-logo.png',
-      'Goiás': 'https://logoeps.com/wp-content/uploads/2013/03/goias-vector-logo.png',
-      'Vila Nova': 'https://logoeps.com/wp-content/uploads/2018/02/vila-nova-2018-logo-vector.png',
-      'Operário-PR': 'https://logoeps.com/wp-content/uploads/2019/06/operario-pr-2019-logo-vector.png',
-      'Operário Ferroviário': 'https://logoeps.com/wp-content/uploads/2019/06/operario-pr-2019-logo-vector.png',
-      'Novorizontino': 'https://logoeps.com/wp-content/uploads/2020/02/novorizontino-2020-logo-vector.png',
-      'Mirassol': 'https://logoeps.com/wp-content/uploads/2020/08/mirassol-2020-logo-vector.png',
+      'Guarani': 'https://upload.wikimedia.org/wikipedia/commons/7/70/Guarani_FC_logo.svg',
+      'Ponte Preta': 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Ponte_Preta_logo.svg',
+      'Avaí': 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Avai_logo.svg',
+      'CRB': 'https://upload.wikimedia.org/wikipedia/commons/3/39/CRB_logo.svg',
+      'Goiás': 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Goias_logo.svg',
+      'Vila Nova': 'https://upload.wikimedia.org/wikipedia/commons/3/32/Vila_Nova_logo.svg',
+      'Operário-PR': 'https://upload.wikimedia.org/wikipedia/commons/4/46/Operario_ferroviario_logo.svg',
+      'Operário Ferroviário': 'https://upload.wikimedia.org/wikipedia/commons/4/46/Operario_ferroviario_logo.svg',
+      'Novorizontino': 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Novorizontino_logo.svg',
+      'Mirassol': 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Mirassol_logo.svg',
       
-      // Seleções - URLs mais estáveis
-      'Brasil': 'https://logoeps.com/wp-content/uploads/2012/11/brazil-national-football-team-vector-logo.png',
-      'Argentina': 'https://logoeps.com/wp-content/uploads/2012/11/argentina-national-football-team-vector-logo.png',
-      'Uruguai': 'https://logoeps.com/wp-content/uploads/2020/09/uruguay-national-football-team-logo-vector.png',
-      'Colômbia': 'https://logoeps.com/wp-content/uploads/2020/09/colombia-national-football-team-logo-vector.png',
-      'Chile': 'https://logoeps.com/wp-content/uploads/2020/09/chile-national-football-team-logo-vector.png',
-      'Peru': 'https://logoeps.com/wp-content/uploads/2020/09/peru-national-football-team-logo-vector.png',
-      'Equador': 'https://logoeps.com/wp-content/uploads/2020/09/ecuador-national-football-team-logo-vector.png',
-      'Paraguai': 'https://logoeps.com/wp-content/uploads/2020/09/paraguay-national-football-team-logo-vector.png',
-      'Bolívia': 'https://logoeps.com/wp-content/uploads/2020/09/bolivia-national-football-team-logo-vector.png',
-      'Venezuela': 'https://logoeps.com/wp-content/uploads/2020/09/venezuela-national-football-team-logo-vector.png',
+      // Seleções
+      'Brasil': 'https://upload.wikimedia.org/wikipedia/commons/9/99/Brazilian_Football_Confederation_logo.svg',
+      'Argentina': 'https://upload.wikimedia.org/wikipedia/commons/7/76/Argentina_national_football_team_logo.svg',
+      'Uruguai': 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg',
+      'Colômbia': 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Federaci%C3%B3n_Colombiana_de_F%C3%BAtbol_logo.svg',
+      'Chile': 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Federaci%C3%B3n_de_F%C3%BAtbol_de_Chile_logo.svg',
+      'Peru': 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Federaci%C3%B3n_Peruana_de_F%C3%BAtbol_logo.svg',
+      'Equador': 'https://upload.wikimedia.org/wikipedia/commons/4/46/Federaci%C3%B3n_Ecuatoriana_de_F%C3%BAtbol_logo.svg',
+      'Paraguai': 'https://upload.wikimedia.org/wikipedia/commons/6/65/Asociaci%C3%B3n_Paraguaya_de_F%C3%BAtbol_logo.svg',
+      'Bolívia': 'https://upload.wikimedia.org/wikipedia/commons/b/b5/Federaci%C3%B3n_Boliviana_de_F%C3%BAtbol_logo.svg',
+      'Venezuela': 'https://upload.wikimedia.org/wikipedia/commons/4/47/Federaci%C3%B3n_Venezolana_de_F%C3%BAtbol_logo.svg',
       
-      // Times internacionais (Libertadores/Sul-Americana)
-      'River Plate': 'https://logoeps.com/wp-content/uploads/2013/03/river-plate-vector-logo.png',
-      'Boca Juniors': 'https://logoeps.com/wp-content/uploads/2013/03/boca-juniors-vector-logo.png',
-      'Peñarol': 'https://logoeps.com/wp-content/uploads/2013/03/penarol-vector-logo.png',
-      'Nacional': 'https://logoeps.com/wp-content/uploads/2013/03/nacional-montevideo-vector-logo.png',
-      'Colo-Colo': 'https://logoeps.com/wp-content/uploads/2013/03/colo-colo-vector-logo.png',
-      'Universidad de Chile': 'https://logoeps.com/wp-content/uploads/2013/03/universidad-de-chile-vector-logo.png',
-      'Racing': 'https://logoeps.com/wp-content/uploads/2013/03/racing-club-vector-logo.png',
-      'Independiente': 'https://logoeps.com/wp-content/uploads/2013/03/independiente-vector-logo.png',
-      'San Lorenzo': 'https://logoeps.com/wp-content/uploads/2013/03/san-lorenzo-vector-logo.png',
+      // Times internacionais (Libertadores/Sul-Americana/Mundial)
+      'River Plate': 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudo_del_C_A_River_Plate.svg',
+      'Boca Juniors': 'https://upload.wikimedia.org/wikipedia/commons/4/41/CABJ_Logo.svg',
+      'Peñarol': 'https://upload.wikimedia.org/wikipedia/commons/6/6c/Penarol_logo.svg',
+      'Nacional': 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Club_Nacional_de_Football_logo.svg',
+      'Colo-Colo': 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Colo-Colo_logo.svg',
+      'Universidad de Chile': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Escudo_de_la_Universidad_de_Chile.svg',
+      'Racing': 'https://upload.wikimedia.org/wikipedia/commons/5/56/Racing_Club_logo.svg',
+      'Independiente': 'https://upload.wikimedia.org/wikipedia/commons/d/db/Escudo_del_Club_Atl%C3%A9tico_Independiente.svg',
+      'San Lorenzo': 'https://upload.wikimedia.org/wikipedia/commons/7/77/Escudo_del_Club_Atletico_San_Lorenzo_de_Almagro.svg',
+      'Real Madrid': 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Real_Madrid_logo.svg',
+      'Manchester City': 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Manchester_City_FC_badge.svg',
+      'Bayern Munich': 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg',
+      'Chelsea': 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Chelsea_FC.svg',
+      'Al Hilal': 'https://upload.wikimedia.org/wikipedia/commons/1/13/Al-Hilal_FC_Logo.svg',
       
-      // Outros países para amistosos
-      'Estados Unidos': 'https://logoeps.com/wp-content/uploads/2020/09/united-states-mens-national-soccer-team-logo-vector.png',
-      'México': 'https://logoeps.com/wp-content/uploads/2020/09/mexico-national-football-team-logo-vector.png',
-      'França': 'https://logoeps.com/wp-content/uploads/2020/09/france-national-football-team-logo-vector.png',
-      'Espanha': 'https://logoeps.com/wp-content/uploads/2020/09/spain-national-football-team-logo-vector.png',
-      'Portugal': 'https://logoeps.com/wp-content/uploads/2020/09/portugal-national-football-team-logo-vector.png',
-      'Inglaterra': 'https://logoeps.com/wp-content/uploads/2020/09/england-national-football-team-logo-vector.png',
-      'Alemanha': 'https://logoeps.com/wp-content/uploads/2020/09/germany-national-football-team-logo-vector.png',
-      'Itália': 'https://logoeps.com/wp-content/uploads/2020/09/italy-national-football-team-logo-vector.png'
+      // Outros países
+      'Estados Unidos': 'https://upload.wikimedia.org/wikipedia/commons/e/e3/US_Soccer_logo.svg',
+      'México': 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Federaci%C3%B3n_Mexicana_de_F%C3%BAtbol_logo.svg',
+      'França': 'https://upload.wikimedia.org/wikipedia/commons/8/86/F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football_logo.svg',
+      'Espanha': 'https://upload.wikimedia.org/wikipedia/commons/3/31/Spain_National_Football_Team_logo.svg',
+      'Portugal': 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Portuguese_Football_Federation_logo.svg',
+      'Inglaterra': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/England_national_football_team_logo.svg',
+      'Alemanha': 'https://upload.wikimedia.org/wikipedia/commons/f/f6/DFB-Logo.svg',
+      'Itália': 'https://upload.wikimedia.org/wikipedia/commons/b/b4/FIGC_logo.svg'
     };
     
     return teamShields[name];
@@ -169,23 +173,27 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
 
   return (
     <div 
-      className="team-flag-container relative"
+      className="team-flag-container relative flex items-center justify-center"
       style={{ width: size, height: size }}
     >
       {shieldUrl && !imageError ? (
         <>
           {/* Loading placeholder enquanto a imagem carrega */}
           {!imageLoaded && (
-            <div className={`absolute inset-0 bg-gradient-to-br ${teamColor} text-white rounded-full flex items-center justify-center font-bold team-flag-fallback animate-pulse`}>
-              <span className="text-xs">{getInitials(teamName)}</span>
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-600 to-gray-700 text-white rounded-full flex items-center justify-center font-bold team-flag-fallback animate-pulse">
+              <span className="text-xs">{teamName.substring(0, 3).toUpperCase()}</span>
             </div>
           )}
           
           <img 
             src={shieldUrl}
             alt={`Escudo ${teamName}`}
-            className={`w-full h-full object-contain p-0.5 transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
+            className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            style={{ 
+              maxWidth: '90%', 
+              maxHeight: '90%',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+            }}
             onError={handleImageError}
             onLoad={handleImageLoad}
             loading="lazy"
@@ -193,10 +201,10 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
         </>
       ) : (
         // Fallback para times sem escudo definido ou com erro
-        <div 
-          className={`w-full h-full bg-gradient-to-br ${teamColor} text-white rounded-full flex items-center justify-center font-bold team-flag-fallback`}
-        >
-          <span className="text-xs">{getInitials(teamName)}</span>
+        <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-700 text-white rounded-full flex items-center justify-center font-bold team-flag-fallback border border-gray-500">
+          <span className="text-xs font-semibold">
+            {teamName.split(' ').map(word => word.charAt(0).toUpperCase()).slice(0, 2).join('')}
+          </span>
         </div>
       )}
     </div>

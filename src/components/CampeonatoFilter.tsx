@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trophy, Globe, Flag, Crown, Award, Star, Zap } from 'lucide-react';
 import { CampeonatoType } from '@/types/game';
 import { CAMPEONATOS } from '@/config/campeonatos';
@@ -16,20 +16,13 @@ const CampeonatoFilter = ({ selectedCampeonato, onCampeonatoChange }: Campeonato
     return icons[iconName as keyof typeof icons] || Trophy;
   };
 
-  const getCampeonatoColor = (id: string) => {
-    switch (id) {
-      case 'brasileiro-a': return 'data-[state=active]:bg-green-600 data-[state=active]:text-white';
-      case 'brasileiro-b': return 'data-[state=active]:bg-blue-600 data-[state=active]:text-white';
-      case 'copa-do-brasil': return 'data-[state=active]:bg-purple-600 data-[state=active]:text-white';
-      case 'libertadores': return 'data-[state=active]:bg-red-600 data-[state=active]:text-white';
-      case 'mundial-clubes': return 'data-[state=active]:bg-purple-700 data-[state=active]:text-white';
-      case 'eliminatorias-copa': return 'data-[state=active]:bg-green-600 data-[state=active]:text-white';
-      case 'amistosos-selecao': return 'data-[state=active]:bg-blue-600 data-[state=active]:text-white';
-      default: return 'data-[state=active]:bg-purple-600 data-[state=active]:text-white';
-    }
-  };
-
   const activeCampeonatos = Object.entries(CAMPEONATOS).filter(([_, camp]) => camp.ativo);
+
+  const getSelectedLabel = () => {
+    if (selectedCampeonato === 'todos') return 'Todos os Campeonatos';
+    const campeonato = CAMPEONATOS[selectedCampeonato as CampeonatoType];
+    return campeonato?.nome || 'Selecione um campeonato';
+  };
 
   return (
     <Card className="mb-6 bg-gray-800 border-gray-700">
@@ -37,32 +30,46 @@ const CampeonatoFilter = ({ selectedCampeonato, onCampeonatoChange }: Campeonato
         <CardTitle className="text-center text-white">Selecione o Campeonato</CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs value={selectedCampeonato} onValueChange={(value) => onCampeonatoChange(value as CampeonatoType | 'todos')}>
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 h-auto p-2 bg-gray-900">
-            <TabsTrigger 
+        <Select 
+          value={selectedCampeonato} 
+          onValueChange={(value) => onCampeonatoChange(value as CampeonatoType | 'todos')}
+        >
+          <SelectTrigger className="w-full bg-gray-900 border-gray-700 text-white hover:bg-gray-800 focus:border-purple-500">
+            <SelectValue placeholder="Selecione um campeonato">
+              <div className="flex items-center gap-3">
+                <Trophy className="w-4 h-4 text-purple-400" />
+                <span>{getSelectedLabel()}</span>
+              </div>
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-80">
+            <SelectItem 
               value="todos" 
-              className="flex items-center gap-2 p-3 text-gray-300 hover:text-white data-[state=active]:bg-purple-600 data-[state=active]:text-white transition-all"
+              className="focus:bg-purple-600 focus:text-white cursor-pointer"
             >
-              <Trophy className="w-4 h-4" />
-              <span className="hidden sm:inline">Todos</span>
-              <span className="sm:hidden">Todos</span>
-            </TabsTrigger>
+              <div className="flex items-center gap-3">
+                <Trophy className="w-4 h-4 text-purple-400" />
+                <span>Todos os Campeonatos</span>
+              </div>
+            </SelectItem>
+            
             {activeCampeonatos.map(([id, campeonato]) => {
               const IconComponent = getIconComponent(campeonato.icone);
               return (
-                <TabsTrigger 
+                <SelectItem 
                   key={id} 
                   value={id}
-                  className={`flex items-center gap-2 p-3 text-xs text-gray-300 hover:text-white transition-all ${getCampeonatoColor(id)}`}
+                  className="focus:bg-purple-600 focus:text-white cursor-pointer"
                 >
-                  <IconComponent className="w-4 h-4" />
-                  <span className="hidden sm:inline">{campeonato.nome}</span>
-                  <span className="sm:hidden">{campeonato.nome.split(' ')[0]}</span>
-                </TabsTrigger>
+                  <div className="flex items-center gap-3">
+                    <IconComponent className="w-4 h-4" />
+                    <span>{campeonato.nome}</span>
+                  </div>
+                </SelectItem>
               );
             })}
-          </TabsList>
-        </Tabs>
+          </SelectContent>
+        </Select>
       </CardContent>
     </Card>
   );
