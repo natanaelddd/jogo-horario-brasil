@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { toast } from "sonner";
 import AdminPanel from '@/components/AdminPanel';
 import AdminLogin from '@/components/AdminLogin';
-import { authService } from '@/services/authService';
+import { AuthService } from '@/services/authService';
 
 const Eliminatorias = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -22,7 +22,8 @@ const Eliminatorias = () => {
 
   const handleAdminLogin = async (password: string) => {
     try {
-      const success = await authService.login(password);
+      const authService = AuthService.getInstance();
+      const success = authService.login('horariodojogo', password);
       if (success) {
         setIsAuthenticated(true);
         toast.success("Login realizado com sucesso!");
@@ -35,7 +36,7 @@ const Eliminatorias = () => {
   };
 
   const handleLogout = () => {
-    authService.logout();
+    AuthService.getInstance().logout();
     setIsAuthenticated(false);
     setShowAdminPanel(false);
     toast.success("Logout realizado com sucesso!");
@@ -60,8 +61,8 @@ const Eliminatorias = () => {
             />
           ) : (
             <AdminPanel 
-              onClose={() => setShowAdminPanel(false)}
-              onLogout={handleLogout}
+              onDataUpdate={handleRefresh}
+              isLoading={false}
             />
           )}
         </>

@@ -10,8 +10,8 @@ import ViewSelector from '@/components/ViewSelector';
 import GamesView from '@/components/GamesView';
 import StandingsView from '@/components/StandingsView';
 import CampeonatosView from '@/components/CampeonatosView';
-import { gameDataService } from '@/services/gameDataService';
-import { authService } from '@/services/authService';
+import { GameDataService } from '@/services/gameDataService';
+import { AuthService } from '@/services/authService';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'games' | 'standings' | 'campeonatos'>('games');
@@ -20,7 +20,7 @@ const Index = () => {
 
   const { data: games = [], isLoading, refetch } = useQuery({
     queryKey: ['games'],
-    queryFn: gameDataService.getAllGames,
+    queryFn: () => GameDataService.getInstance().getAllGames(),
     refetchInterval: 30000, // Atualiza a cada 30 segundos
   });
 
@@ -35,7 +35,8 @@ const Index = () => {
 
   const handleAdminLogin = async (password: string) => {
     try {
-      const success = await authService.login(password);
+      const authService = AuthService.getInstance();
+      const success = authService.login('horariodojogo', password);
       if (success) {
         setIsAuthenticated(true);
         toast.success("Login realizado com sucesso!");
@@ -48,10 +49,19 @@ const Index = () => {
   };
 
   const handleLogout = () => {
-    authService.logout();
+    AuthService.getInstance().logout();
     setIsAuthenticated(false);
     setShowAdminPanel(false);
     toast.success("Logout realizado com sucesso!");
+  };
+
+  const handleViewChange = (view: 'jogos' | 'classificacao' | 'campeonato') => {
+    const viewMap = {
+      'jogos': 'games',
+      'classificacao': 'standings',
+      'campeonato': 'campeonatos'
+    } as const;
+    setCurrentView(viewMap[view]);
   };
 
   return (
@@ -65,11 +75,16 @@ const Index = () => {
       <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <ViewSelector currentView={currentView} onViewChange={setCurrentView} />
+        <ViewSelector currentView={currentView} onViewChange={handleViewChange} />
         
         {currentView === 'games' && <GamesView games={games} />}
-        {currentView === 'standings' && <StandingsView />}
-        {currentView === 'campeonatos' && <CampeonatosView />}
+        {currentView === 'standings' && <StandingsView selectedCampeonato="" />}
+        {currentView === 'campeonatos' && (
+          <CampeonatosView 
+            onCampeonatoSelect={() => {}}
+            onViewChange={() => {}}
+          />
+        )}
       </div>
 
       {showAdminPanel && (
@@ -81,8 +96,8 @@ const Index = () => {
             />
           ) : (
             <AdminPanel 
-              onClose={() => setShowAdminPanel(false)}
-              onLogout={handleLogout}
+              onDataUpdate={handleRefresh}
+              isLoading={isLoading}
             />
           )}
         </>
