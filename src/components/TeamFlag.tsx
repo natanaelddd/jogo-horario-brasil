@@ -8,7 +8,7 @@ interface TeamFlagProps {
 
 const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
   const getTeamShieldUrl = (name: string) => {
-    // URLs dos escudos dos times brasileiros do Google
+    // URLs dos escudos dos times brasileiros mais confiáveis
     const teamShields: { [key: string]: string } = {
       'Flamengo': 'https://logoeps.com/wp-content/uploads/2013/03/flamengo-vector-logo.png',
       'Palmeiras': 'https://logoeps.com/wp-content/uploads/2013/03/palmeiras-vector-logo.png',
@@ -29,7 +29,11 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
       'Fortaleza': 'https://logoeps.com/wp-content/uploads/2013/03/fortaleza-vector-logo.png',
       'Athletico-PR': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-pr-vector-logo.png',
       'Bahia': 'https://logoeps.com/wp-content/uploads/2013/03/bahia-vector-logo.png',
-      'Bragantino': 'https://logoeps.com/wp-content/uploads/2013/03/red-bull-bragantino-vector-logo.png'
+      'Bragantino': 'https://logoeps.com/wp-content/uploads/2013/03/red-bull-bragantino-vector-logo.png',
+      'Juventude': 'https://logoeps.com/wp-content/uploads/2013/03/juventude-vector-logo.png',
+      'Cuiabá': 'https://logoeps.com/wp-content/uploads/2013/03/cuiaba-vector-logo.png',
+      'Atlético-GO': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-go-vector-logo.png',
+      'Chapecoense': 'https://logoeps.com/wp-content/uploads/2013/03/chapecoense-vector-logo.png'
     };
     
     return teamShields[name];
@@ -57,7 +61,11 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
       'Fortaleza': 'bg-blue-600',
       'Athletico-PR': 'bg-red-600',
       'Bahia': 'bg-blue-600',
-      'Bragantino': 'bg-red-600'
+      'Bragantino': 'bg-red-600',
+      'Juventude': 'bg-green-600',
+      'Cuiabá': 'bg-yellow-600',
+      'Atlético-GO': 'bg-red-600',
+      'Chapecoense': 'bg-green-600'
     };
     
     return teamColors[name] || 'bg-primary';
@@ -76,23 +84,22 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
 
   return (
     <div 
-      className={`flex items-center justify-center rounded-full relative overflow-hidden shadow-sm border ${teamColor}`}
+      className="flex items-center justify-center rounded-full relative overflow-hidden shadow-sm border bg-white"
       style={{ width: size, height: size }}
     >
       {shieldUrl ? (
         <img 
           src={shieldUrl}
           alt={`Escudo ${teamName}`}
-          className="w-full h-full object-contain p-1"
+          className="w-full h-full object-contain p-0.5"
+          style={{ maxWidth: '100%', maxHeight: '100%' }}
           onError={(e) => {
-            // Em caso de erro, mostra as iniciais com a cor do time
+            // Em caso de erro na imagem, substitui por um fallback com iniciais
             const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
             const parent = target.parentElement;
             if (parent) {
               parent.innerHTML = `
-                <div class="w-full h-full ${teamColor} text-white rounded-full flex items-center justify-center font-bold" 
-                     style="font-size: ${size * 0.4}px">
+                <div class="w-full h-full ${teamColor} text-white rounded-full flex items-center justify-center font-bold text-xs">
                   ${getInitials(teamName)}
                 </div>
               `;
@@ -102,8 +109,7 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
       ) : (
         // Fallback para times sem escudo definido
         <div 
-          className={`w-full h-full ${teamColor} text-white rounded-full flex items-center justify-center font-bold`}
-          style={{ fontSize: size * 0.4 }}
+          className={`w-full h-full ${teamColor} text-white rounded-full flex items-center justify-center font-bold text-xs`}
         >
           {getInitials(teamName)}
         </div>
