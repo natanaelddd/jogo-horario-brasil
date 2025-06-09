@@ -8,32 +8,32 @@ interface TeamFlagProps {
 
 const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
   const getTeamShieldUrl = (name: string) => {
-    // URLs dos escudos dos times brasileiros - Wikipedia e fontes oficiais
+    // URLs dos escudos dos times brasileiros - fontes mais confiáveis
     const teamShields: { [key: string]: string } = {
-      'Flamengo': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Flamengo-RJ_%28BRA%29.png',
-      'Palmeiras': 'https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg',
-      'Corinthians': 'https://upload.wikimedia.org/wikipedia/en/5/5a/Corinthians_logo.svg',
-      'São Paulo': 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Sao_Paulo_Futebol_Clube.svg',
-      'Santos': 'https://upload.wikimedia.org/wikipedia/commons/3/35/Santos_logo.svg',
-      'Botafogo': 'https://upload.wikimedia.org/wikipedia/commons/5/52/Botafogo_de_Futebol_e_Regatas_logo.svg',
-      'Atlético-MG': 'https://upload.wikimedia.org/wikipedia/en/c/c2/Atletico_Mineiro_logo.svg',
-      'Cruzeiro': 'https://upload.wikimedia.org/wikipedia/en/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg',
-      'Grêmio': 'https://upload.wikimedia.org/wikipedia/en/f/f1/Gremio_logo.svg',
-      'Internacional': 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Escudo_do_Sport_Club_Internacional.svg',
-      'Fluminense': 'https://upload.wikimedia.org/wikipedia/en/3/33/Fluminense_FC_escudo.svg',
-      'Vasco': 'https://upload.wikimedia.org/wikipedia/en/a/ac/CR_Vasco_da_Gama_Logo.svg',
-      'Sport': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Sport_Club_do_Recife_%28emblem%29.svg',
-      'Ceará': 'https://upload.wikimedia.org/wikipedia/en/3/3c/Ceara_logo.svg',
-      'Coritiba': 'https://upload.wikimedia.org/wikipedia/en/9/99/Coritiba_logo.svg',
-      'Vitória': 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Vit%C3%B3ria_logo.svg',
-      'Fortaleza': 'https://upload.wikimedia.org/wikipedia/commons/4/40/FortalezaEsporteClube.svg',
-      'Athletico-PR': 'https://upload.wikimedia.org/wikipedia/en/5/56/Athletico_Paranaense.svg',
-      'Bahia': 'https://upload.wikimedia.org/wikipedia/en/4/43/EC_Bahia_logo.svg',
-      'Bragantino': 'https://upload.wikimedia.org/wikipedia/en/9/9b/RB_Bragantino_logo.svg',
-      'Juventude': 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Juventude_logo.svg',
-      'Cuiabá': 'https://upload.wikimedia.org/wikipedia/en/2/2e/Cuiab%C3%A1_Esporte_Clube_logo.svg',
-      'Atlético-GO': 'https://upload.wikimedia.org/wikipedia/en/6/6f/Atletico_Goianiense_logo.svg',
-      'Chapecoense': 'https://upload.wikimedia.org/wikipedia/en/9/9b/Chapecoense_logo.svg'
+      'Flamengo': 'https://logoeps.com/wp-content/uploads/2013/03/flamengo-vector-logo.png',
+      'Palmeiras': 'https://logoeps.com/wp-content/uploads/2013/03/palmeiras-vector-logo.png',
+      'Corinthians': 'https://logoeps.com/wp-content/uploads/2013/03/corinthians-vector-logo.png',
+      'São Paulo': 'https://logoeps.com/wp-content/uploads/2013/03/sao-paulo-vector-logo.png',
+      'Santos': 'https://logoeps.com/wp-content/uploads/2013/03/santos-vector-logo.png',
+      'Botafogo': 'https://logoeps.com/wp-content/uploads/2013/03/botafogo-vector-logo.png',
+      'Atlético-MG': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-mineiro-vector-logo.png',
+      'Cruzeiro': 'https://logoeps.com/wp-content/uploads/2013/03/cruzeiro-vector-logo.png',
+      'Grêmio': 'https://logoeps.com/wp-content/uploads/2013/03/gremio-vector-logo.png',
+      'Internacional': 'https://logoeps.com/wp-content/uploads/2013/03/internacional-vector-logo.png',
+      'Fluminense': 'https://logoeps.com/wp-content/uploads/2013/03/fluminense-vector-logo.png',
+      'Vasco': 'https://logoeps.com/wp-content/uploads/2013/03/vasco-da-gama-vector-logo.png',
+      'Sport': 'https://logoeps.com/wp-content/uploads/2013/03/sport-recife-vector-logo.png',
+      'Ceará': 'https://static.wikia.nocookie.net/logopedia/images/7/76/Ceará_SC.png',
+      'Coritiba': 'https://static.wikia.nocookie.net/logopedia/images/0/0e/Coritiba_FC.png',
+      'Vitória': 'https://static.wikia.nocookie.net/logopedia/images/8/84/EC_Vitória.png',
+      'Fortaleza': 'https://logoeps.com/wp-content/uploads/2013/03/fortaleza-vector-logo.png',
+      'Athletico-PR': 'https://logoeps.com/wp-content/uploads/2013/03/atletico-paranaense-vector-logo.png',
+      'Bahia': 'https://logoeps.com/wp-content/uploads/2013/03/bahia-vector-logo.png',
+      'Bragantino': 'https://static.wikia.nocookie.net/logopedia/images/2/2b/RB_Bragantino.png',
+      'Juventude': 'https://static.wikia.nocookie.net/logopedia/images/4/43/EC_Juventude.png',
+      'Cuiabá': 'https://static.wikia.nocookie.net/logopedia/images/0/04/Cuiabá_EC.png',
+      'Atlético-GO': 'https://static.wikia.nocookie.net/logopedia/images/3/3f/Atlético_Clube_Goianiense.png',
+      'Chapecoense': 'https://static.wikia.nocookie.net/logopedia/images/9/9b/Chapecoense.png'
     };
     
     return teamShields[name];
@@ -84,7 +84,7 @@ const TeamFlag = ({ teamName, size = 20 }: TeamFlagProps) => {
 
   return (
     <div 
-      className="flex items-center justify-center rounded-full relative overflow-hidden shadow-sm border bg-white"
+      className="flex items-center justify-center rounded-full relative overflow-hidden shadow-sm border bg-card"
       style={{ width: size, height: size }}
     >
       {shieldUrl ? (
