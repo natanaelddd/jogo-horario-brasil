@@ -1,5 +1,5 @@
 
-import { Home, Trophy, Globe, Settings, Flag, Crown, Award, Star, Zap } from 'lucide-react';
+import { Home, Trophy, Globe, Settings, Flag, Crown, Award, Star, Zap, Users, Newspaper } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -23,7 +23,19 @@ const AppSidebar = () => {
       title: "Início",
       href: "/",
       icon: Home,
-      description: "Página principal"
+      description: "Página principal com destaques e jogos"
+    },
+    {
+      title: "Times",
+      href: "/times",
+      icon: Users,
+      description: "Todos os times e suas estatísticas"
+    },
+    {
+      title: "Notícias",
+      href: "/noticias",
+      icon: Newspaper,
+      description: "Últimas notícias do futebol"
     },
     {
       title: "Eliminatórias",
@@ -46,7 +58,7 @@ const AppSidebar = () => {
         <div className="flex items-center p-4">
           <div>
             <h2 className="text-lg font-bold text-white">Horário do Jogo</h2>
-            <p className="text-xs text-gray-400">Todos os jogos em tempo real</p>
+            <p className="text-xs text-gray-400">Portal completo de futebol</p>
           </div>
         </div>
       </SidebarHeader>
@@ -54,7 +66,7 @@ const AppSidebar = () => {
       <SidebarContent className="bg-gray-900">
         <SidebarGroup>
           <SidebarGroupLabel className="text-purple-400 font-semibold uppercase text-xs tracking-wider">
-            Menu Principal
+            Navegação Principal
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
