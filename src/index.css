@@ -122,3 +122,21 @@
     background-color: hsl(var(--brasil-yellow));
   }
 }
+
+/* Google Material Icons customization */
+.material-icons-outlined {
+  font-feature-settings: 'liga';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}
