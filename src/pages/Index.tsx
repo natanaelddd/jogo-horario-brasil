@@ -65,10 +65,25 @@ const Index = () => {
     setCurrentView(viewMap[view]);
   };
 
-  // Filtrar jogos por campeonato
-  const filteredGames = selectedCampeonato === 'todos' 
-    ? games 
-    : games.filter(game => game.campeonato === selectedCampeonato);
+  // Filtrar jogos apenas do mês de maio (2025-05) para a home
+  const filterMayGames = (games: Game[]): Game[] => {
+    return games.filter(game => {
+      const gameDate = new Date(game.data);
+      const gameYear = gameDate.getFullYear();
+      const gameMonth = gameDate.getMonth() + 1; // getMonth() retorna 0-11
+      
+      // Apenas jogos de maio de 2025
+      return gameYear === 2025 && gameMonth === 5;
+    });
+  };
+
+  // Para a view de games (home), filtrar apenas jogos de maio
+  let filteredGames = currentView === 'games' ? filterMayGames(games) : games;
+  
+  // Aplicar filtro de campeonato apenas se não for 'todos'
+  if (selectedCampeonato !== 'todos') {
+    filteredGames = filteredGames.filter(game => game.campeonato === selectedCampeonato);
+  }
 
   // Encontrar o próximo jogo mais relevante para o Hero Section
   const getHeroGame = (games: Game[]): Game | null => {
@@ -137,11 +152,11 @@ const Index = () => {
                     <Card className="bg-gray-800 border-gray-700 text-center py-8">
                       <CardContent>
                         <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-                        <h3 className="text-lg font-semibold mb-2 text-white">Nenhum jogo encontrado</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-white">Nenhum jogo de maio encontrado</h3>
                         <p className="text-gray-400">
                           {selectedCampeonato === 'todos' 
-                            ? 'Não há jogos agendados no momento.' 
-                            : `Não há jogos agendados para este campeonato.`
+                            ? 'Não há jogos de maio agendados no momento.' 
+                            : `Não há jogos de maio agendados para este campeonato.`
                           }
                         </p>
                       </CardContent>
@@ -164,7 +179,7 @@ const Index = () => {
                           <p className="text-2xl font-bold text-purple-400">
                             {filteredGames.length}
                           </p>
-                          <p className="text-sm text-gray-400">Total de Jogos</p>
+                          <p className="text-sm text-gray-400">Jogos de Maio</p>
                         </div>
                         <div>
                           <p className="text-2xl font-bold text-green-400">
