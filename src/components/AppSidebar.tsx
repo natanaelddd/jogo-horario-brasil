@@ -14,7 +14,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { CAMPEONATOS } from '@/config/campeonatos';
-import Logo from './Logo';
 
 const AppSidebar = () => {
   const location = useLocation();
@@ -44,8 +43,7 @@ const AppSidebar = () => {
   return (
     <Sidebar className="border-r border-gray-700">
       <SidebarHeader className="border-b border-gray-700 bg-gray-900">
-        <div className="flex items-center gap-3 p-4">
-          <Logo />
+        <div className="flex items-center p-4">
           <div>
             <h2 className="text-lg font-bold text-white">Horário do Jogo</h2>
             <p className="text-xs text-gray-400">Todos os jogos em tempo real</p>
