@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Game } from '@/types/game';
 import { Calendar, Clock, MapPin, Tv } from 'lucide-react';
@@ -19,7 +20,7 @@ const HeroGameSection: React.FC<HeroGameSectionProps> = ({ game }) => {
         </div>
       </div>
     );
-  }
+  };
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -72,12 +73,7 @@ const HeroGameSection: React.FC<HeroGameSectionProps> = ({ game }) => {
               
               {/* Time Casa */}
               <div className="text-center">
-                <div className="w-20 h-20 mx-auto mb-3 bg-gray-700 rounded-full flex items-center justify-center border-2 border-purple-500/50">
-                  <span className="text-white font-bold text-lg">
-                    {game.time_casa.substring(0, 3).toUpperCase()}
-                  </span>
-                </div>
-                <h3 className="text-white font-bold text-lg">{game.time_casa}</h3>
+                <h3 className="text-white font-bold text-xl mb-2">{game.time_casa}</h3>
                 <span className="text-gray-400 text-sm">Casa</span>
               </div>
 
@@ -113,12 +109,7 @@ const HeroGameSection: React.FC<HeroGameSectionProps> = ({ game }) => {
 
               {/* Time Fora */}
               <div className="text-center">
-                <div className="w-20 h-20 mx-auto mb-3 bg-gray-700 rounded-full flex items-center justify-center border-2 border-blue-500/50">
-                  <span className="text-white font-bold text-lg">
-                    {game.time_fora.substring(0, 3).toUpperCase()}
-                  </span>
-                </div>
-                <h3 className="text-white font-bold text-lg">{game.time_fora}</h3>
+                <h3 className="text-white font-bold text-xl mb-2">{game.time_fora}</h3>
                 <span className="text-gray-400 text-sm">Visitante</span>
               </div>
             </div>
@@ -139,4 +130,3 @@ const HeroGameSection: React.FC<HeroGameSectionProps> = ({ game }) => {
 };
 
 export default HeroGameSection;
-

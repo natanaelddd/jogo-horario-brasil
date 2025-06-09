@@ -4,7 +4,6 @@ import { Game } from '@/types/game';
 import { Calendar, Clock, MapPin, Tv, Trophy, Play, CheckCircle, Clock3 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import TeamFlag from './TeamFlag';
 
 interface GameCardProps {
   game: Game;
@@ -84,14 +83,11 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
         <div className="grid grid-cols-3 gap-4 items-center mb-4">
           {/* Time Casa */}
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-2 bg-gray-700/50 rounded-full flex items-center justify-center border-2 border-purple-500/30 group-hover:border-purple-500/60 transition-all duration-300 overflow-hidden">
-              <TeamFlag teamName={game.time_casa} size={40} />
-            </div>
-            <div className="text-white text-sm font-semibold truncate">
+            <div className="text-white text-sm font-semibold mb-2 truncate">
               {game.time_casa}
             </div>
             {game.placar_casa !== null && (
-              <div className="text-green-400 font-bold text-2xl mt-1">
+              <div className="text-green-400 font-bold text-2xl">
                 {game.placar_casa}
               </div>
             )}
@@ -108,14 +104,11 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
           {/* Time Fora */}
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-2 bg-gray-700/50 rounded-full flex items-center justify-center border-2 border-blue-500/30 group-hover:border-blue-500/60 transition-all duration-300 overflow-hidden">
-              <TeamFlag teamName={game.time_fora} size={40} />
-            </div>
-            <div className="text-white text-sm font-semibold truncate">
+            <div className="text-white text-sm font-semibold mb-2 truncate">
               {game.time_fora}
             </div>
             {game.placar_fora !== null && (
-              <div className="text-green-400 font-bold text-2xl mt-1">
+              <div className="text-green-400 font-bold text-2xl">
                 {game.placar_fora}
               </div>
             )}

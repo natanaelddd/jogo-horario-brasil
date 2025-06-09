@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StandingsService, Standing } from '@/services/standingsService';
 import { CAMPEONATOS } from '@/config/campeonatos';
 import { CampeonatoType } from '@/types/game';
-import TeamFlag from './TeamFlag';
 
 interface StandingsTableProps {
   campeonato: CampeonatoType;
@@ -124,7 +123,6 @@ const StandingsTable = ({ campeonato }: StandingsTableProps) => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <TeamFlag teamName={standing.team.nome} size={24} />
                       <div>
                         <p className="font-medium text-sm text-foreground">{standing.team.nome}</p>
                         <p className="text-xs text-muted-foreground">{standing.team.sigla}</p>
