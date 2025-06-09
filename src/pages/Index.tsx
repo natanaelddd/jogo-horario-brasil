@@ -1,132 +1,92 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { GameDataService } from '@/services/gameDataService';
-import { CampeonatoType } from '@/types/game';
-import { useToast } from '@/hooks/use-toast';
-import AdminPanel from '@/components/AdminPanel';
+import { toast } from "sonner";
+import Navigation from '@/components/Navigation';
 import AppHeader from '@/components/AppHeader';
+import AdminPanel from '@/components/AdminPanel';
+import AdminLogin from '@/components/AdminLogin';
 import ViewSelector from '@/components/ViewSelector';
-import CampeonatoFilter from '@/components/CampeonatoFilter';
 import GamesView from '@/components/GamesView';
 import StandingsView from '@/components/StandingsView';
 import CampeonatosView from '@/components/CampeonatosView';
-import StatsCard from '@/components/StatsCard';
+import { gameDataService } from '@/services/gameDataService';
+import { authService } from '@/services/authService';
 
 const Index = () => {
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [selectedCampeonato, setSelectedCampeonato] = useState<CampeonatoType | 'todos'>('todos');
-  const [activeView, setActiveView] = useState<'jogos' | 'classificacao' | 'campeonato'>('jogos');
-  const { toast } = useToast();
+  const [currentView, setCurrentView] = useState<'games' | 'standings' | 'campeonatos'>('games');
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const { data: games = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['games', selectedCampeonato],
-    queryFn: async () => {
-      const gameService = GameDataService.getInstance();
-      if (selectedCampeonato === 'todos') {
-        return await gameService.fetchAllGames();
-      } else {
-        return await gameService.fetchGamesByCampeonato(selectedCampeonato);
-      }
-    },
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+  const { data: games = [], isLoading, refetch } = useQuery({
+    queryKey: ['games'],
+    queryFn: gameDataService.getAllGames,
+    refetchInterval: 30000, // Atualiza a cada 30 segundos
   });
 
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Erro ao carregar jogos",
-        description: "Não foi possível carregar os dados dos jogos. Tente novamente.",
-        variant: "destructive"
-      });
-    }
-  }, [error, toast]);
-
-  const handleManualRefresh = async () => {
+  const handleRefresh = async () => {
     try {
       await refetch();
-      toast({
-        title: "Dados atualizados",
-        description: "Os jogos foram atualizados com sucesso!"
-      });
-    } catch {
-      toast({
-        title: "Erro na atualização",
-        description: "Falha ao atualizar os dados",
-        variant: "destructive"
-      });
+      toast.success("Dados atualizados com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao atualizar dados");
     }
   };
 
-  const filteredGames = selectedCampeonato === 'todos' 
-    ? games 
-    : games.filter(game => game.campeonato === selectedCampeonato);
+  const handleAdminLogin = async (password: string) => {
+    try {
+      const success = await authService.login(password);
+      if (success) {
+        setIsAuthenticated(true);
+        toast.success("Login realizado com sucesso!");
+      } else {
+        toast.error("Senha incorreta");
+      }
+    } catch (error) {
+      toast.error("Erro no login");
+    }
+  };
 
-  if (showAdmin) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 p-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold gradient-brasil bg-clip-text text-transparent">
-              Painel Administrativo
-            </h1>
-            <button
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-              onClick={() => setShowAdmin(false)}
-            >
-              Voltar ao Site
-            </button>
-          </div>
-          <AdminPanel onDataUpdate={handleManualRefresh} isLoading={isLoading} />
-        </div>
-      </div>
-    );
-  }
+  const handleLogout = () => {
+    authService.logout();
+    setIsAuthenticated(false);
+    setShowAdminPanel(false);
+    toast.success("Logout realizado com sucesso!");
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
-      <div className="container mx-auto px-4 py-8">
-        <AppHeader 
-          onRefresh={handleManualRefresh}
-          onShowAdmin={() => setShowAdmin(true)}
-          isLoading={isLoading}
-        />
+    <div className="min-h-screen bg-gray-50">
+      <Navigation 
+        onRefresh={handleRefresh}
+        onShowAdmin={() => setShowAdminPanel(true)}
+        isLoading={isLoading}
+      />
+      
+      <AppHeader />
 
-        <ViewSelector 
-          activeView={activeView}
-          onViewChange={setActiveView}
-        />
-
-        {activeView !== 'campeonato' && (
-          <CampeonatoFilter 
-            selectedCampeonato={selectedCampeonato}
-            onCampeonatoChange={setSelectedCampeonato}
-          />
-        )}
-
-        {activeView === 'jogos' && (
-          <>
-            <GamesView 
-              games={games}
-              isLoading={isLoading}
-              selectedCampeonato={selectedCampeonato}
-            />
-            <StatsCard games={filteredGames} />
-          </>
-        )}
-
-        {activeView === 'classificacao' && (
-          <StandingsView selectedCampeonato={selectedCampeonato} />
-        )}
-
-        {activeView === 'campeonato' && (
-          <CampeonatosView 
-            onCampeonatoSelect={setSelectedCampeonato}
-            onViewChange={setActiveView}
-          />
-        )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <ViewSelector currentView={currentView} onViewChange={setCurrentView} />
+        
+        {currentView === 'games' && <GamesView games={games} />}
+        {currentView === 'standings' && <StandingsView />}
+        {currentView === 'campeonatos' && <CampeonatosView />}
       </div>
+
+      {showAdminPanel && (
+        <>
+          {!isAuthenticated ? (
+            <AdminLogin 
+              onLogin={handleAdminLogin}
+              onClose={() => setShowAdminPanel(false)}
+            />
+          ) : (
+            <AdminPanel 
+              onClose={() => setShowAdminPanel(false)}
+              onLogout={handleLogout}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 };
