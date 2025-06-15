@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from "sonner";
@@ -15,6 +14,7 @@ import GamesSection from '@/components/GamesSection';
 import { GameDataService } from '@/services/gameDataService';
 import { AuthService } from '@/services/authService';
 import { CampeonatoType } from '@/types/game';
+import MundialClubeDestaque from '@/components/MundialClubeDestaque';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'games' | 'standings' | 'campeonatos'>('games');
@@ -71,15 +71,15 @@ const Index = () => {
             onShowAdmin={() => setShowAdminPanel(true)}
             isLoading={isLoading}
           />
-          
           <AppHeader />
-
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            {/* DESTAQUE DO MUNDIAL DE CLUBES */}
+            <MundialClubeDestaque />
+            {/* selector de views, jogos, campeonatos etc */}
             <ViewSelector 
               activeView={currentView === 'games' ? 'jogos' : currentView === 'standings' ? 'classificacao' : 'campeonato'} 
               onViewChange={handleViewChange} 
             />
-            
             {currentView === 'games' && (
               <GamesSection
                 games={games}
@@ -88,11 +88,9 @@ const Index = () => {
                 onCampeonatoChange={setSelectedCampeonato}
               />
             )}
-            
             {currentView === 'standings' && (
               <StandingsView selectedCampeonato={selectedCampeonato} />
             )}
-            
             {currentView === 'campeonatos' && (
               <CampeonatosView 
                 onCampeonatoSelect={(campeonato) => {
@@ -103,7 +101,6 @@ const Index = () => {
               />
             )}
           </div>
-
           {showAdminPanel && (
             <>
               {!isAuthenticated ? (
