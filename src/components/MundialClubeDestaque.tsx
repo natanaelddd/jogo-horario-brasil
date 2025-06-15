@@ -1,10 +1,13 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { Trophy, Tv2 } from "lucide-react";
+import { Trophy, Tv2, youtube as YoutubeIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { Game } from "@/types/game";
 import { GameDataService } from "@/services/gameDataService";
+
+// URL oficial do canal de jogos ao vivo da CazéTV no YouTube
+const CAZE_TV_URL = "https://www.youtube.com/@CazeTV";
 
 const MundialClubeDestaque = () => {
   // Buscar os jogos do "mundial-clubes"
@@ -57,10 +60,18 @@ const MundialClubeDestaque = () => {
                   <TableHead>
                     <Tv2 className="w-4 h-4 inline mr-1" /> Onde Assistir
                   </TableHead>
+                  <TableHead>
+                    {/* Vazio para o botão ao vivo */}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {jogos.map((jogo) => (
+                {jogos.map((jogo) => {
+                  const isAoVivo = jogo.status === "ao_vivo";
+                  const transmiteCazeTv = (jogo.transmissao ?? []).some(
+                    t => t.toLowerCase().includes("cazetv") || t.toLowerCase().includes("cazé tv") || t.toLowerCase().includes("cazé")
+                  );
+                  return (
                   <TableRow key={jogo.id} className="border-yellow-900/50">
                     <TableCell>{new Date(jogo.data).toLocaleDateString("pt-BR")}</TableCell>
                     <TableCell>{jogo.hora}</TableCell>
@@ -80,8 +91,22 @@ const MundialClubeDestaque = () => {
                         : <span className="italic text-gray-400">Indisponível</span>
                       }
                     </TableCell>
+                    <TableCell>
+                      {isAoVivo && transmiteCazeTv && (
+                        <a
+                          href={CAZE_TV_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md transition-all outline-none focus:ring-2 focus:ring-yellow-400"
+                          title="Assistir ao vivo na CazéTV"
+                        >
+                          <YoutubeIcon className="w-4 h-4" />
+                          Ao vivo: CazéTV
+                        </a>
+                      )}
+                    </TableCell>
                   </TableRow>
-                ))}
+                )})}
               </TableBody>
             </Table>
             <div className="mt-4 text-sm text-yellow-100">
@@ -96,3 +121,4 @@ const MundialClubeDestaque = () => {
 };
 
 export default MundialClubeDestaque;
+
