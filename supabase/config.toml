@@ -1,1 +1,5 @@
+
 project_id = "itgmfywhkvywttiysnfi"
+
+[functions.sync-campeonatos]
+verify_jwt = true
