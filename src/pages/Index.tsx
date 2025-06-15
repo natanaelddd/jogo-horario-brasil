@@ -15,6 +15,7 @@ import { GameDataService } from '@/services/gameDataService';
 import { AuthService } from '@/services/authService';
 import { CampeonatoType } from '@/types/game';
 import MundialClubeDestaque from '@/components/MundialClubeDestaque';
+import { useGamesRealtime } from "@/hooks/useGamesRealtime";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'games' | 'standings' | 'campeonatos'>('games');
@@ -26,6 +27,11 @@ const Index = () => {
     queryKey: ['games'],
     queryFn: () => GameDataService.getInstance().fetchAllGames(),
     refetchInterval: 30000,
+  });
+
+  // Atualização automática em tempo real dos jogos
+  useGamesRealtime(() => {
+    refetch();
   });
 
   const handleRefresh = async () => {
