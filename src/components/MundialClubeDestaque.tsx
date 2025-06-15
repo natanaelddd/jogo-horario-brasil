@@ -1,8 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { Trophy, Tv2, youtube as YoutubeIcon } from "lucide-react";
+import { Trophy, Tv2, Youtube } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { Game } from "@/types/game";
 import { GameDataService } from "@/services/gameDataService";
 
@@ -30,7 +29,7 @@ const MundialClubeDestaque = () => {
   });
 
   return (
-    <Card className="mb-6 bg-gradient-to-b from-yellow-100/10 to-gray-900 border-2 border-yellow-400 shadow-xl">
+    <Card className="mb-8 bg-gradient-to-b from-yellow-100/10 to-gray-900 border-2 border-yellow-400 shadow-xl">
       <CardHeader className="flex flex-row items-center gap-3 pb-3">
         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-400 shadow">
           <Trophy className="w-7 h-7 text-gray-900" />
@@ -39,7 +38,9 @@ const MundialClubeDestaque = () => {
           <CardTitle className="text-xl font-extrabold text-yellow-200 group-hover:text-yellow-400 transition-colors">
             Mundial de Clubes 2025 - Destaque
           </CardTitle>
-          <span className="text-xs text-yellow-200/90">Veja os confrontos e onde assistir ao Mundial de Clubes FIFA!</span>
+          <span className="text-xs text-yellow-200/90">
+            Veja os confrontos e onde assistir ao Mundial de Clubes FIFA!
+          </span>
         </div>
       </CardHeader>
       <CardContent>
@@ -48,71 +49,59 @@ const MundialClubeDestaque = () => {
         ) : jogos.length === 0 ? (
           <div className="text-center text-yellow-300 py-8">Nenhum confronto do Mundial de Clubes encontrado.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-yellow-500/10">
-                  <TableHead>Data</TableHead>
-                  <TableHead>Horário</TableHead>
-                  <TableHead>Fase</TableHead>
-                  <TableHead>Confronto</TableHead>
-                  <TableHead className="min-w-[100px]">Estádio</TableHead>
-                  <TableHead>
-                    <Tv2 className="w-4 h-4 inline mr-1" /> Onde Assistir
-                  </TableHead>
-                  <TableHead>
-                    {/* Vazio para o botão ao vivo */}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {jogos.map((jogo) => {
-                  const isAoVivo = jogo.status === "ao_vivo";
-                  const transmiteCazeTv = (jogo.transmissao ?? []).some(
-                    t => t.toLowerCase().includes("cazetv") || t.toLowerCase().includes("cazé tv") || t.toLowerCase().includes("cazé")
-                  );
-                  return (
-                  <TableRow key={jogo.id} className="border-yellow-900/50">
-                    <TableCell>{new Date(jogo.data).toLocaleDateString("pt-BR")}</TableCell>
-                    <TableCell>{jogo.hora}</TableCell>
-                    <TableCell>{jogo.fase || "-"}</TableCell>
-                    <TableCell>
-                      <span className="font-semibold">{jogo.time_casa}</span> x <span className="font-semibold">{jogo.time_fora}</span>
-                    </TableCell>
-                    <TableCell>{jogo.estadio}</TableCell>
-                    <TableCell>
-                      {(jogo.transmissao ?? []).length > 0
-                        ? jogo.transmissao.map((canal, idx) => (
-                            <span key={canal}>
-                              {canal}
-                              {idx < ((jogo.transmissao ?? []).length - 1) ? ", " : ""}
-                            </span>
-                          ))
-                        : <span className="italic text-gray-400">Indisponível</span>
-                      }
-                    </TableCell>
-                    <TableCell>
-                      {isAoVivo && transmiteCazeTv && (
-                        <a
-                          href={CAZE_TV_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md transition-all outline-none focus:ring-2 focus:ring-yellow-400"
-                          title="Assistir ao vivo na CazéTV"
-                        >
-                          <YoutubeIcon className="w-4 h-4" />
-                          Ao vivo: CazéTV
-                        </a>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                )})}
-              </TableBody>
-            </Table>
-            <div className="mt-4 text-sm text-yellow-100">
-              <span className="inline-flex items-center gap-1 font-semibold"><Tv2 className="w-4 h-4" /> Onde assistir:</span>
-              <span className="ml-2">{canaisTransmissao.length > 0 ? canaisTransmissao.join(", ") : "Ainda não divulgado"}</span>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {jogos.map((jogo) => {
+              const isAoVivo = jogo.status === "ao_vivo";
+              const transmiteCazeTv = (jogo.transmissao ?? []).some(
+                t => t.toLowerCase().includes("cazetv") || t.toLowerCase().includes("cazé tv") || t.toLowerCase().includes("cazé")
+              );
+              return (
+                <div key={jogo.id} className="bg-yellow-100/5 border border-yellow-900/30 rounded-xl shadow-lg p-5 flex flex-col justify-between relative">
+                  {/* Ao vivo badge */}
+                  {isAoVivo && transmiteCazeTv && (
+                    <a
+                      href={CAZE_TV_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute right-4 top-4 flex items-center gap-1 px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow transition-all outline-none focus:ring-2 focus:ring-yellow-400 z-10"
+                      title="Assistir ao vivo na CazéTV"
+                    >
+                      <Youtube className="w-4 h-4" />
+                      Ao vivo: CazéTV
+                    </a>
+                  )}
+
+                  <div className="mb-3">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="bg-yellow-500/30 text-yellow-200 text-xs font-semibold px-2 py-0.5 rounded">{jogo.fase || "Fase"}</span>
+                      <span className="text-gray-300 text-xs">{new Date(jogo.data).toLocaleDateString("pt-BR")}</span>
+                      <span className="bg-gray-700 text-xs text-yellow-100 font-bold px-2 py-0.5 rounded">{jogo.hora}</span>
+                    </div>
+                    <div className="text-lg font-bold text-yellow-100">{jogo.time_casa} <span className="text-yellow-500">x</span> {jogo.time_fora}</div>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
+                    <Tv2 className="w-4 h-4 inline" />
+                    {(jogo.transmissao ?? []).length > 0
+                      ? jogo.transmissao.join(", ")
+                      : <span className="italic text-gray-400">Indisponível</span>
+                    }
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-yellow-200 mb-2">
+                    <span className="font-medium">Estádio:</span>
+                    <span>{jogo.estadio}</span>
+                  </div>
+                  <div className="flex gap-1 mt-auto">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${isAoVivo ? "bg-red-600 text-white" : jogo.status === "finalizado" ? "bg-green-700 text-green-100" : "bg-blue-700 text-blue-100"}`}>
+                      {isAoVivo
+                        ? "AO VIVO"
+                        : jogo.status === "finalizado"
+                          ? "Finalizado"
+                          : "Agendado"}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </CardContent>
@@ -121,4 +110,3 @@ const MundialClubeDestaque = () => {
 };
 
 export default MundialClubeDestaque;
-
