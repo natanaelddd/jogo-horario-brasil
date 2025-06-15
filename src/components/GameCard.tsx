@@ -27,7 +27,8 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  // Badge do status principal
+  const getStatusBadge = (status: string, data: string) => {
     switch (status) {
       case 'ao_vivo': 
         return (
@@ -37,10 +38,11 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
           </Badge>
         );
       case 'finalizado': 
+        // Exibe a data do jogo finalizado
         return (
           <Badge className="bg-green-600 text-white border-green-500 hover:bg-green-700 transition-colors">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            <span className="font-semibold">ENCERRADO</span>
+            <Calendar className="w-3 h-3 mr-1" />
+            <span className="font-semibold">{formatDate(data)}</span>
           </Badge>
         );
       default: 
@@ -99,7 +101,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             <div className="text-white font-bold text-lg mb-2">
               {game.hora}
             </div>
-            {getStatusBadge(game.status)}
+            {getStatusBadge(game.status ?? 'agendado', game.data)}
           </div>
 
           {/* Time Fora */}
