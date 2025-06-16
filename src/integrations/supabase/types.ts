@@ -42,6 +42,45 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          created_at: string | null
+          day_of_week: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          order: number | null
+          time: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          order?: number | null
+          time?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          order?: number | null
+          time?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       fetch_logs: {
         Row: {
           campeonato: string
@@ -176,6 +215,126 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hero_slides: {
+        Row: {
+          button_text: string
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          order: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          button_text: string
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          order?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          button_text?: string
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          order?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      navigation_links: {
+        Row: {
+          created_at: string | null
+          href: string
+          id: string
+          is_active: boolean | null
+          order: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          href: string
+          id?: string
+          is_active?: boolean | null
+          order?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          href?: string
+          id?: string
+          is_active?: boolean | null
+          order?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reading_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          plan_url: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          plan_url: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          plan_url?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          content_value: string | null
+          created_at: string | null
+          id: string
+          section_key: string
+          updated_at: string | null
+        }
+        Insert: {
+          content_value?: string | null
+          created_at?: string | null
+          id?: string
+          section_key: string
+          updated_at?: string | null
+        }
+        Update: {
+          content_value?: string | null
+          created_at?: string | null
+          id?: string
+          section_key?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       standings: {
         Row: {
